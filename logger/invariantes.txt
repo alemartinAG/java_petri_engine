@@ -1,0 +1,3 @@
+Estados invalidos de la red:
+- Entre las plazas de poniendo en buffer y la de la exclusion mutua, tiene que haber un solo token (es un invariante)
+- Entre sensor disp y sensor ocup tambien tiene que haber un solo token, en los sensores y en la bateria

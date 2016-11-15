@@ -1,0 +1,125 @@
+t 955.0 310.0 Poner_En_Buffer_Met n 0 w n {} ne
+t 695.0 315.0 Poner_En_Buffer_Resp n 0 w n {} ne
+t 580.0 310.0 Reportar_Err_Resp s 0 w n {} ne
+p 1140.0 220.0 Lectura_Fuente 0 n
+t 690.0 1335.0 Reportar_Err_Shock e 0 w n {} ne
+t 640.0 1215.0 Enviar_Shock w 0 w n {<A,N>} e
+p 640.0 1275.0 Lectura_Shock 0 n
+p 395.0 1125.0 Error_Calculo 0 s
+p 690.0 1415.0 Error 0 n
+p 105.0 215.0 Lectura_Pulsacion 0 n
+t 60.0 310.0 Reportar_Err_Pul s 0 w n {} ne
+p 380.0 215.0 Lectura_Acelerometro 0 n
+p 630.0 215.0 Lectura_Respiracion 0 n
+p 890.0 215.0 Lectura_Metabolismo 0 n
+t 500.0 110.0 Leer_Sensores e 20 22 s {} ne
+t 1140.0 125.0 Leer_Sen_Bat ne 80 83 e {} ne
+t 140.0 535.0 Poner_En_Buffer_Pul2 s 0 w n {<A,N>} e
+p 320.0 430.0 Error_Lec_Acel 0 n
+p 580.0 435.0 Error_Lect_Resp 0 n
+t 695.0 535.0 Poner_En_Buffer_Resp2 se 0 w n {<A,N>} e
+p 695.0 435.0 Usando_Buffer_Resp 0 s
+p 830.0 435.0 Error_Lect_Meta 0 n
+p 955.0 435.0 Usando_Buffer_Met 0 s
+t 1100.0 310.0 Reportar_Err_Bat s 0 w n {} ne
+t 1190.0 310.0 Poner_En_Buffer_Bat n 0 w n {} ne
+p 1100.0 435.0 Error_Lect_Bateria 0 n
+t 1190.0 540.0 Poner_En_Buffer_Bat2 s 0 w n {<A,N>} e
+p 1190.0 435.0 Usando_Buffer_Bat 0 s
+t 320.0 310.0 Reportar_Err_Acel s 0 w n {} ne
+t 830.0 310.0 Reportar_Err_Met s 0 w n {} ne
+t 140.0 310.0 Poner_En_Buffer_Pul n 0 w n {} ne
+t 435.0 315.0 Poner_En_Buffer_Acel n 0 w n {} ne
+p 435.0 430.0 Usando_Buffer_Acel 0 s
+p 640.0 1125.0 Pulso_Listo 0 s
+t 855.0 1045.0 No_Necesita_Estimulacion s 0 w n {} ne
+p 755.0 1140.0 Telemetria 0 n
+p 585.0 1410.0 Correcto 0 n
+t 585.0 1335.0 Registrar_Shock w 0 w n {} ne
+t 640.0 1040.0 Necesita_Estimulacion s 0 w n {} ne
+t 395.0 1035.0 Reportar_Err_Calculo s 0 w n {} ne
+p 60.0 430.0 Error_Lect_Pul 0 n
+p 140.0 425.0 Usando_Buffer_Pul 0 s
+t 435.0 540.0 Poner_En_Buffer_Acel2 s 0 w n {<A,N>} e
+t 955.0 530.0 Poner_En_Buffer_Met2 s 0 w n {<A,N>} e
+p 1015.0 125.0 Sen_Bat_Ocup 0 w
+t 1015.0 30.0 t3 c 0 w n {<A,N>} w
+p 1140.0 30.0 Sen_Bat_Disp 1 e
+p 390.0 110.0 Sensores_Ocup 0 w
+t 390.0 30.0 t2 c 0 w n {<A,N>} w
+p 500.0 30.0 Sensores_Disp 1 e
+p 635.0 685.0 Exc_Buffer 1 s
+p 640.0 805.0 Buffer 0 w
+p 640.0 980.0 Calculando 0 n
+t 640.0 885.0 Vaciar_Buffer w 200 205 e {} ne
+e Vaciar_Buffer Calculando 1 n
+e t3 Sen_Bat_Disp 1 n
+e Sen_Bat_Ocup t3 1 n
+e Leer_Sen_Bat Sen_Bat_Ocup 1 n
+e t2 Sensores_Disp 1 n
+e Leer_Sensores Sensores_Ocup 1 n
+e Sensores_Ocup t2 1 n
+e Exc_Buffer 0.2471065925 55.00909016 Poner_En_Buffer_Resp 0.479576724 62.51399843 1 n
+e Reportar_Err_Bat Error_Lect_Bateria 1 n
+e Lectura_Fuente Reportar_Err_Bat 1 n
+e Poner_En_Buffer_Pul2 0.8944044746 180.2359565 Exc_Buffer 0.625 72.12489168 1 n
+e Poner_En_Buffer_Met2 0.5886691006 71.86793444 Exc_Buffer 0.05321003457 100.5683847 1 n
+e Exc_Buffer 0.1042082251 195.4123845 Poner_En_Buffer_Met 0.6617196803 108.2266141 1 n
+e Exc_Buffer 0.5069154248 115.1086443 Poner_En_Buffer_Pul 0.7876956511 119.3314711 1 n
+e Poner_En_Buffer_Bat Usando_Buffer_Bat 1 n
+e Lectura_Fuente Poner_En_Buffer_Bat 1 n
+e Lectura_Shock Reportar_Err_Shock 1 n
+e Reportar_Err_Shock Error 1 n
+e Registrar_Shock Correcto 1 n
+e Lectura_Shock Registrar_Shock 1 n
+e Poner_En_Buffer_Acel2 0.7875996013 55.54277633 Exc_Buffer 0.4891652952 44.10215414 1 n
+e Exc_Buffer 0.3118444309 161.0031056 Poner_En_Buffer_Acel 0.1091372413 56.85068161 1 n
+e Poner_En_Buffer_Resp2 0.6782750223 34.43835072 Exc_Buffer 0.179369794 67.54257916 1 n
+e Usando_Buffer_Met Poner_En_Buffer_Met2 1 n
+e Usando_Buffer_Resp Poner_En_Buffer_Resp2 1 n
+e Usando_Buffer_Acel Poner_En_Buffer_Acel2 1 n
+e Usando_Buffer_Pul Poner_En_Buffer_Pul2 1 n
+e Poner_En_Buffer_Pul Usando_Buffer_Pul 1 n
+e Lectura_Pulsacion Poner_En_Buffer_Pul 1 n
+e Poner_En_Buffer_Acel Usando_Buffer_Acel 1 n
+e Lectura_Acelerometro Poner_En_Buffer_Acel 1 n
+e Lectura_Respiracion Poner_En_Buffer_Resp 1 n
+e Poner_En_Buffer_Resp Usando_Buffer_Resp 1 n
+e Poner_En_Buffer_Met Usando_Buffer_Met 1 n
+e Lectura_Metabolismo Poner_En_Buffer_Met 1 n
+e Poner_En_Buffer_Pul2 Buffer 1 n
+e Poner_En_Buffer_Acel2 0.7547494837 67.0298441 Buffer 0.3371472365 60.02603602 1 n
+e Poner_En_Buffer_Resp2 0.782254129 74.52516354 Buffer 0.1811801651 71.58910532 1 n
+e Poner_En_Buffer_Met2 0.7434406259 97.08243919 Buffer 0.09550095755 86.33148325 1 n
+e Buffer Vaciar_Buffer !1 n
+e Calculando Reportar_Err_Calculo 1 n
+e Reportar_Err_Calculo Error_Calculo 1 n
+e Usando_Buffer_Bat Poner_En_Buffer_Bat2 1 n
+e Poner_En_Buffer_Bat2 Buffer 1 n
+e Lectura_Metabolismo Reportar_Err_Met 1 n
+e Reportar_Err_Met Error_Lect_Meta 1 n
+e Lectura_Respiracion Reportar_Err_Resp 1 n
+e Reportar_Err_Resp Error_Lect_Resp 1 n
+e Lectura_Acelerometro Reportar_Err_Acel 1 n
+e Reportar_Err_Acel Error_Lec_Acel 1 n
+e Lectura_Pulsacion Reportar_Err_Pul 1 n
+e Reportar_Err_Pul Error_Lect_Pul 1 n
+e Exc_Buffer 0.01198896533 212.6029163 Poner_En_Buffer_Bat 0.7266573025 177.9100897 1 n
+e Poner_En_Buffer_Bat2 0.5585659849 177.9100897 Exc_Buffer 0.004165408438 191.0654338 1 n
+e Sen_Bat_Disp Leer_Sen_Bat 1 n
+e Sensores_Disp Leer_Sensores 1 n
+e Calculando Necesita_Estimulacion 1 n
+e Necesita_Estimulacion Pulso_Listo 1 n
+e Calculando No_Necesita_Estimulacion 1 n
+e Pulso_Listo Enviar_Shock 1 n
+e Enviar_Shock Lectura_Shock 1 n
+e Leer_Sensores Lectura_Pulsacion 1 n
+e Leer_Sensores Lectura_Acelerometro 1 n
+e Leer_Sensores Lectura_Respiracion 1 n
+e Leer_Sensores Lectura_Metabolismo 1 n
+e Leer_Sen_Bat Lectura_Fuente 1 n
+e No_Necesita_Estimulacion Telemetria 1 n
+e Necesita_Estimulacion Telemetria 1 n
+h PacemakerPetriNet
+
+
