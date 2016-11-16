@@ -27,16 +27,21 @@ public class Logger {
 		try {
 			archivo = new FileWriter("logger/logueo.txt", true);
 			printer = new BufferedWriter(archivo);
+			
+			printer.write("estados = []\n");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 	
 	public synchronized void loggearEstadoPetri(){
+		// El logueo se realiza en formato de una lista de python,
+		// con el fin de poder comparar los estados facilmente con un script
 		Integer[] aux = new Integer[petri.getCurrentMarking().length];
 		aux = petri.getCurrentMarking();
+		
 		try {
-			printer.write("estado_" + contador + " = [");
+			printer.write("estados.append([");
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
@@ -51,7 +56,7 @@ public class Logger {
 			}
 		}
 		try {
-			printer.write("]\n");
+			printer.write("])\n");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

@@ -25,6 +25,9 @@ public class Procesador {
 		for(int valor : valores){
 			resultado += valor;
 		}
+		////////////////////////////////////////////////////////////////////////////////////////
+		// Los valores puestos para la comprobacion del pulso son inventados,
+		// Deberian ponerse los valores reales de acuerdo al dominio del sistema en caso de implementarlo
 		if(resultado < 0){
 			estado = Estado.ERROR_CALCULO;
 			logger.loggearError(codigoLogueo.ERROR_CALCULO, time);

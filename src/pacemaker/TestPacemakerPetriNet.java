@@ -9,43 +9,39 @@ import monitor_petri.MonitorManager;
 
 public class TestPacemakerPetriNet {
 
-	
 	public static MonitorManager monitor;
 	public static TimedPetriNet petri;
 	public static FirstInLinePolicy policy;
 	public static PetriNetFactory factory;
 	public static Logger logger;
 	public static String PNML = "pacemakerPetriNet/PacemakerPetriNet.pnml";
-	public static int w0=0, w1=0, w2=0, w3=0, w4=0;
 	static boolean flag = true;
-	static long timeDesde = 0;
-	static long timeHasta = 0;
 	
 	public static void main(String[] args) {
+		////////////////////////////////////////////////////////////////////////////////////////
+		//Inicializacion de los objetos necesarios para la creacion de la Petri
 		factory = new PetriNetFactory(PNML);
 		petri = (TimedPetriNet) factory.makePetriNet(petriNetType.TIMED);
 		logger = new Logger(petri);
 		policy = new FirstInLinePolicy();
 		monitor = new MonitorManager(petri, policy);
 		
-		//worker0 thread fires "Leer sensores" 2
+		////////////////////////////////////////////////////////////////////////////////////////
+		//Creacion de los hilos, los cuales tienen la responsabilidad de:
+		// - Disparar la transicion que se les explicita,
+		// - Disparar las transiciones automaticas que quedaron sensibilizadas luego de su primer disparo
+		// - Logear el estado de la red despues de los disparos efectuados
+		
 		Thread worker0 = new Thread(() -> {
 			while(flag){
 				try {
 					monitor.fireTransition("Leer_Sensores");
-					
-					timeDesde = System.currentTimeMillis();
 					logger.loggearEstadoPetri();
-					timeHasta = System.currentTimeMillis();
-					
-					System.out.println(timeHasta - timeDesde);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
-				w0++;
 			}
 		});
-		//worker1 thread fires "Leer sensor bateria" 1
 		Thread worker1 = new Thread(() -> {
 			while(flag){
 				try {
@@ -54,10 +50,8 @@ public class TestPacemakerPetriNet {
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
-				w1++;
 			}
 		});
-		//worker2 thread fires "vaciar buffer" 23
 		Thread worker2 = new Thread(() -> {
 			while(flag){
 				try {
@@ -66,10 +60,8 @@ public class TestPacemakerPetriNet {
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
-				w2++;
 			}
 		});
-		//worker3 thread fires "necesita estimulacion" 3
 		Thread worker3 = new Thread(() -> {
 			while(flag){
 				try {
@@ -78,10 +70,8 @@ public class TestPacemakerPetriNet {
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
-				w3++;
 			}
 		});
-		//worker4 thread fires "registrar shock" 15
 		Thread worker4 = new Thread(() -> {
 			while(flag){
 				try {
@@ -90,10 +80,8 @@ public class TestPacemakerPetriNet {
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
-				w4++;
 			}
-		});
-		
+		});		
 		Thread worker5 = new Thread(() -> {
 			while(flag){
 				try {
@@ -103,8 +91,7 @@ public class TestPacemakerPetriNet {
 					e.printStackTrace();
 				}
 			}
-		});
-		
+		});		
 		Thread worker6 = new Thread(() -> {
 			while(flag){
 				try {
@@ -114,8 +101,7 @@ public class TestPacemakerPetriNet {
 					e.printStackTrace();
 				}
 			}
-		});
-		
+		});		
 		Thread worker7 = new Thread(() -> {
 			while(flag){
 				try {
@@ -125,8 +111,7 @@ public class TestPacemakerPetriNet {
 					e.printStackTrace();
 				}
 			}
-		});
-		
+		});		
 		Thread worker8 = new Thread(() -> {
 			while(flag){
 				try {
@@ -136,8 +121,7 @@ public class TestPacemakerPetriNet {
 					e.printStackTrace();
 				}
 			}
-		});
-		
+		});		
 		Thread worker9 = new Thread(() -> {
 			while(flag){
 				try {
@@ -147,10 +131,14 @@ public class TestPacemakerPetriNet {
 					e.printStackTrace();
 				}
 			}
-		});
+		});		
 		
+		////////////////////////////////////////////////////////////////////////////////////////
+		// Inicializacion de la red de petr
 		petri.initializePetriNet();
 		
+		////////////////////////////////////////////////////////////////////////////////////////
+		// Inicializacion de los hilos creados anteriormente
 		worker0.start();
 		worker1.start();
 		worker2.start();
@@ -161,32 +149,28 @@ public class TestPacemakerPetriNet {
 		worker7.start();
 		worker8.start();
 		worker9.start();
-		int timeToSleep = 10000;
+		
+		////////////////////////////////////////////////////////////////////////////////////////
+		// Aqui se duerme al hilo principal, con el fin de dejar a los demas hilos que ejecuten la red
+		int timeToSleep = 5000;
 		try {
 			Thread.sleep(timeToSleep);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
 		
+		////////////////////////////////////////////////////////////////////////////////////////
+		// Esta bandera hace que los hilos terminen su ejecucion
 		flag = false;
-		
 		try {
 			Thread.sleep(100);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
 		
+		////////////////////////////////////////////////////////////////////////////////////////
+		// Se escribe el archivo con todos los logueos de los hilos
 		logger.flush();
-		//logger.close();
-		
-		System.out.println("Run time: " + timeToSleep + " milliseconds");
-		System.out.println("Transition Leer_Sensores was fired " + w0 + " times");
-		System.out.println("Transition Leer_Sen_Bateria was fired " + w1 + " times");
-		System.out.println("Transition Vaciar_Buffer was fired " + w2 + " times");
-		System.out.println("Transition Necesita_Estimulacion was fired " + w3 + " times");
-		System.out.println("Transition Registrar Shock was fired " + w4 + " times");
-		
-		System.out.println(petri.getPlaces()[22].getMarking());
 		
 		System.out.println("END");
 	}
