@@ -3,18 +3,18 @@ package pacemaker;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.unc.lac.javapetriconcurrencymonitor.monitor.PetriMonitor;
+import org.unc.lac.javapetriconcurrencymonitor.monitor.policies.FirstInLinePolicy;
+import org.unc.lac.javapetriconcurrencymonitor.monitor.policies.TransitionsPolicy;
+import org.unc.lac.javapetriconcurrencymonitor.petrinets.PetriNet;
+import org.unc.lac.javapetriconcurrencymonitor.petrinets.TimedPetriNet;
+import org.unc.lac.javapetriconcurrencymonitor.petrinets.factory.PetriNetFactory;
+import org.unc.lac.javapetriconcurrencymonitor.petrinets.factory.PetriNetFactory.petriNetType;
 
-import Petri.PetriNet;
-import Petri.PetriNetFactory;
-import Petri.TimedPetriNet;
-import Petri.PetriNetFactory.petriNetType;
-import monitor_petri.FirstInLinePolicy;
-import monitor_petri.MonitorManager;
-import monitor_petri.TransitionsPolicy;
 import pacemaker.Procesador.Estado;
 
 public class PacemakerTestSuite {
-	MonitorManager monitor;
+	PetriMonitor monitor;
 	PetriNet petri;
 	TimedPetriNet timedPetriNet;
 	static TransitionsPolicy policy;
@@ -36,7 +36,7 @@ public class PacemakerTestSuite {
 	private void setUpMonitor(String PNML, petriNetType type){
 		factory = new PetriNetFactory(PNML);
 		petri = factory.makePetriNet(type);
-		monitor = new MonitorManager(petri, policy);
+		monitor = new PetriMonitor(petri, policy);
 		petri.initializePetriNet();
 	}
 	

@@ -4,7 +4,8 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 
-import Petri.PetriNet;
+import org.unc.lac.javapetriconcurrencymonitor.petrinets.PetriNet;
+
 
 public class Logger {
 	

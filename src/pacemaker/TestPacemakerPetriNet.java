@@ -1,15 +1,14 @@
 package pacemaker;
 
-import Petri.PetriNetFactory;
-import Petri.PetriNetFactory.petriNetType;
-import Petri.TimedPetriNet;
-import Petri.Transition;
-import monitor_petri.FirstInLinePolicy;
-import monitor_petri.MonitorManager;
+import org.unc.lac.javapetriconcurrencymonitor.monitor.PetriMonitor;
+import org.unc.lac.javapetriconcurrencymonitor.monitor.policies.FirstInLinePolicy;
+import org.unc.lac.javapetriconcurrencymonitor.petrinets.TimedPetriNet;
+import org.unc.lac.javapetriconcurrencymonitor.petrinets.factory.PetriNetFactory;
+import org.unc.lac.javapetriconcurrencymonitor.petrinets.factory.PetriNetFactory.petriNetType;
 
 public class TestPacemakerPetriNet {
 
-	public static MonitorManager monitor;
+	public static PetriMonitor monitor;
 	public static TimedPetriNet petri;
 	public static FirstInLinePolicy policy;
 	public static PetriNetFactory factory;
@@ -24,7 +23,7 @@ public class TestPacemakerPetriNet {
 		petri = (TimedPetriNet) factory.makePetriNet(petriNetType.TIMED);
 		logger = new Logger(petri);
 		policy = new FirstInLinePolicy();
-		monitor = new MonitorManager(petri, policy);
+		monitor = new PetriMonitor(petri, policy);
 		
 		////////////////////////////////////////////////////////////////////////////////////////
 		//Creacion de los hilos, los cuales tienen la responsabilidad de:
