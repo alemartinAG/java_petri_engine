@@ -12,6 +12,8 @@ import org.unc.lac.javapetriconcurrencymonitor.petrinets.components.Label;
 import org.unc.lac.javapetriconcurrencymonitor.petrinets.components.Place;
 import org.unc.lac.javapetriconcurrencymonitor.petrinets.components.Transition;
 
+import pacemaker.Logger;
+
 /**
  * Implementation for petri net model.
  * This class describes a general basic petri net.
@@ -44,6 +46,7 @@ public abstract class PetriNet {
 	protected boolean hasResetArcs;
 	protected boolean hasReaderArcs;
 	
+	protected Logger logger;
 	
 	protected boolean initializedPetriNet;
 	
@@ -88,6 +91,7 @@ public abstract class PetriNet {
 		hasInhibitionArcs = isMatrixNonZero(inhibitionMatrix);
 		hasResetArcs = isMatrixNonZero(resetMatrix);
 		hasReaderArcs = isMatrixNonZero(readerMatrix);
+		this.logger = new Logger(this);
 	}
 	
 	/**
@@ -183,9 +187,15 @@ public abstract class PetriNet {
 			places[i].setMarking(currentMarking[i]);
 		}
 		
+		logger.loggearEstadoPetri();//PRUEBA
+		
 		enabledTransitions = computeEnabledTransitions();
 		
 		return true;
+	}
+	
+	public void flush(){
+		logger.flush();
 	}
 	
 	/**
@@ -228,6 +238,16 @@ public abstract class PetriNet {
 			throw new IllegalArgumentException("No place matches the name " + placeName);
 		}
 		return new Place(filteredPlace.get());
+	}
+	
+	public Transition getTransition(final String transitionName) throws IllegalArgumentException{
+		Optional<Transition> filteredTransition = Arrays.stream(getTransitions())
+				.filter((Transition t) -> t.getName().equals(transitionName))
+				.findFirst();
+		if(!filteredTransition.isPresent()){
+			throw new IllegalArgumentException("No transition matches the name " + transitionName);
+		}
+		return filteredTransition.get();
 	}
 	
 	/**

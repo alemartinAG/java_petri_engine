@@ -1,7 +1,5 @@
 from estados import *
 
-fail = False
-
 for estado in estados:
     if ((estado[20] + estado [21] == 1))\
     and ((estado[18] + estado[19]) == 1)\
@@ -9,4 +7,6 @@ for estado in estados:
         print("estado valido")
     else:
         print("estado invalido")
-print(fail)
+
+
+

@@ -35,7 +35,7 @@ public class Logger {
 		}
 	}
 	
-	public synchronized void loggearEstadoPetri(){
+	public void loggearEstadoPetri(){
 		// El logueo se realiza en formato de una lista de python,
 		// con el fin de poder comparar los estados facilmente con un script
 		Integer[] aux = new Integer[petri.getCurrentMarking().length];
@@ -141,7 +141,7 @@ public class Logger {
 		return contador;
 	}
 
-	private synchronized void aumentarContador() {
+	private void aumentarContador() {
 		this.contador += 1;
 	}
 }
