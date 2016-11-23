@@ -14,6 +14,7 @@ import org.unc.lac.javapetriconcurrencymonitor.exceptions.NotInitializedPetriNet
 import org.unc.lac.javapetriconcurrencymonitor.monitor.PetriMonitor;
 import org.unc.lac.javapetriconcurrencymonitor.monitor.policies.FirstInLinePolicy;
 import org.unc.lac.javapetriconcurrencymonitor.monitor.policies.TransitionsPolicy;
+import org.unc.lac.javapetriconcurrencymonitor.petrinets.PetriNet;
 import org.unc.lac.javapetriconcurrencymonitor.petrinets.TimedPetriNet;
 import org.unc.lac.javapetriconcurrencymonitor.petrinets.components.Transition;
 import org.unc.lac.javapetriconcurrencymonitor.petrinets.factory.PetriNetFactory;
@@ -33,6 +34,7 @@ public class PetriMonitorTimeTestSuite {
 	private static final String TEST_PETRI_FOLDER = "test/org/lac/javapetriconcurrencymonitor/test/resources/";
 	private static final String TIMED_PETRI_NET = TEST_PETRI_FOLDER + "timedPetri.pnml";
 	private static final String TIMED_PETRI_NET_02 = TEST_PETRI_FOLDER + "timedPetri02.pnml";
+	private static final String TIMED_PETRI_NET_03 = TEST_PETRI_FOLDER + "timedPetriWithAutomaticTransitions.pnml";
 	private static final String PETRI_FOR_INITIALIZATION_TIME = TEST_PETRI_FOLDER + "timedPetriForInitializationTime.pnml";
 	private static final String PETRI_FOR_INITIALIZATION_TIME2 = TEST_PETRI_FOLDER + "timedPetriForInitializationTime2.pnml";
 
@@ -723,5 +725,38 @@ public class PetriMonitorTimeTestSuite {
 		for(Thread worker : workers){
 			Assert.assertEquals(Thread.State.WAITING, worker.getState());
 		}
+	}
+	
+	/**
+	 * <li> </li>
+	 */
+	@Test
+	public void testWhenFiringTimedTransitionThenAllAutomaticTransitionEnabledWereFired(){
+		setUpMonitor(TIMED_PETRI_NET_03);
+		
+		Integer[] expectedMarking = {1,0,0,0,0};
+		Assert.assertArrayEquals(expectedMarking, timedPetriNet.getCurrentMarking());
+		Thread th0 = new Thread(() -> {
+			for(int i=0; i<10; i++){
+				try {
+					monitor.fireTransition("t0");
+				} catch (IllegalTransitionFiringError | NotInitializedPetriNetException e) {
+					Assert.fail("Exception thrown in test execution");
+				}
+			}
+		});
+		
+		timedPetriNet.initializePetriNet();		
+		th0.start();
+		
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		
+		expectedMarking[4] = 10;
+		
+		Assert.assertArrayEquals(expectedMarking, timedPetriNet.getCurrentMarking());
 	}
 }

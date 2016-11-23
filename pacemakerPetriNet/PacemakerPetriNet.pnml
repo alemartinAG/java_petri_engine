@@ -1,894 +1,125 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<pnml xmlns="http://www.pnml.org/version-2009/grammar/pnml">
- <net id="n-1D6C-DB68B-0" type ="http://www.laas.fr/tina/tpn">
-  <name>
-   <text>PacemakerPetriNet</text>
-  </name>
- <page id="g-1D6C-DB697-1">
-  <place id="p-1D6C-DB69B-2">
-  <name>
-   <text>Buffer</text>
-    <graphics>
-     <offset x="-10" y="0" />
-    </graphics>
-  </name>
-   <graphics>
-    <position x="640" y="805"/>
-   </graphics>
-  </place>
-  <place id="p-1D6C-DB6A9-3">
-  <name>
-   <text>Calculando</text>
-    <graphics>
-     <offset x="0" y="-10" />
-    </graphics>
-  </name>
-   <graphics>
-    <position x="640" y="980"/>
-   </graphics>
-  </place>
-  <place id="p-1D6C-DB6AD-4">
-  <name>
-   <text>Correcto</text>
-    <graphics>
-     <offset x="0" y="-10" />
-    </graphics>
-  </name>
-   <graphics>
-    <position x="585" y="1410"/>
-   </graphics>
-  </place>
-  <transition id="t-1D6C-DB6B1-5">
-  <name>
-   <text>Enviar_Shock</text>
-    <graphics>
-     <offset x="-10" y="0" />
-    </graphics>
-  </name>
-   <label>
-    <text>&lt;A,N&gt;</text>
-    <graphics>
-     <offset x="10" y="0" />
-    </graphics>
-   </label>
-   <graphics>
-    <position x="640" y="1215"/>
-   </graphics>
-  </transition>
-  <place id="p-1D6C-DB6B7-6">
-  <name>
-   <text>Error</text>
-    <graphics>
-     <offset x="0" y="-10" />
-    </graphics>
-  </name>
-   <graphics>
-    <position x="690" y="1415"/>
-   </graphics>
-  </place>
-  <place id="p-1D6C-DB6BA-7">
-  <name>
-   <text>Error_Calculo</text>
-    <graphics>
-     <offset x="0" y="10" />
-    </graphics>
-  </name>
-   <graphics>
-    <position x="395" y="1125"/>
-   </graphics>
-  </place>
-  <place id="p-1D6C-DB6BC-8">
-  <name>
-   <text>Error_Lec_Acel</text>
-    <graphics>
-     <offset x="0" y="-10" />
-    </graphics>
-  </name>
-   <graphics>
-    <position x="320" y="430"/>
-   </graphics>
-  </place>
-  <place id="p-1D6C-DB6C0-9">
-  <name>
-   <text>Error_Lect_Bateria</text>
-    <graphics>
-     <offset x="0" y="-10" />
-    </graphics>
-  </name>
-   <graphics>
-    <position x="1100" y="435"/>
-   </graphics>
-  </place>
-  <place id="p-1D6C-DB6C5-10">
-  <name>
-   <text>Error_Lect_Meta</text>
-    <graphics>
-     <offset x="0" y="-10" />
-    </graphics>
-  </name>
-   <graphics>
-    <position x="830" y="435"/>
-   </graphics>
-  </place>
-  <place id="p-1D6C-DB6C8-11">
-  <name>
-   <text>Error_Lect_Pul</text>
-    <graphics>
-     <offset x="0" y="-10" />
-    </graphics>
-  </name>
-   <graphics>
-    <position x="60" y="430"/>
-   </graphics>
-  </place>
-  <place id="p-1D6C-DB6CC-12">
-  <name>
-   <text>Error_Lect_Resp</text>
-    <graphics>
-     <offset x="0" y="-10" />
-    </graphics>
-  </name>
-   <graphics>
-    <position x="580" y="435"/>
-   </graphics>
-  </place>
-  <place id="p-1D6C-DB6CF-13">
-  <name>
-   <text>Exc_Buffer</text>
-    <graphics>
-     <offset x="0" y="10" />
-    </graphics>
-  </name>
-   <initialMarking>
-    <text>1</text>
-   </initialMarking>
-   <graphics>
-    <position x="635" y="685"/>
-   </graphics>
-  </place>
-  <place id="p-1D6C-DB6D3-14">
-  <name>
-   <text>Lectura_Acelerometro</text>
-    <graphics>
-     <offset x="0" y="-10" />
-    </graphics>
-  </name>
-   <graphics>
-    <position x="380" y="215"/>
-   </graphics>
-  </place>
-  <place id="p-1D6C-DB6D6-15">
-  <name>
-   <text>Lectura_Fuente</text>
-    <graphics>
-     <offset x="0" y="-10" />
-    </graphics>
-  </name>
-   <graphics>
-    <position x="1140" y="220"/>
-   </graphics>
-  </place>
-  <place id="p-1D6C-DB6DA-16">
-  <name>
-   <text>Lectura_Metabolismo</text>
-    <graphics>
-     <offset x="0" y="-10" />
-    </graphics>
-  </name>
-   <graphics>
-    <position x="890" y="215"/>
-   </graphics>
-  </place>
-  <place id="p-1D6C-DB6DE-17">
-  <name>
-   <text>Lectura_Pulsacion</text>
-    <graphics>
-     <offset x="0" y="-10" />
-    </graphics>
-  </name>
-   <graphics>
-    <position x="105" y="215"/>
-   </graphics>
-  </place>
-  <place id="p-1D6C-DB6E1-18">
-  <name>
-   <text>Lectura_Respiracion</text>
-    <graphics>
-     <offset x="0" y="-10" />
-    </graphics>
-  </name>
-   <graphics>
-    <position x="630" y="215"/>
-   </graphics>
-  </place>
-  <place id="p-1D6C-DB6E5-19">
-  <name>
-   <text>Lectura_Shock</text>
-    <graphics>
-     <offset x="0" y="-10" />
-    </graphics>
-  </name>
-   <graphics>
-    <position x="640" y="1275"/>
-   </graphics>
-  </place>
-  <transition id="t-1D6C-DB756-20">
-  <name>
-   <text>Leer_Sen_Bat</text>
-    <graphics>
-     <offset x="10" y="-10" />
-    </graphics>
-  </name>
-   <delay>
-    <interval xmlns="http://www.w3.org/1998/Math/MathML" closure="closed-open">
-     <cn>80</cn>
-     <ci>infty</ci>
-    </interval>
-    <graphics>
-     <offset x="0" y="-10" />
-    </graphics>
-   </delay>
-   <graphics>
-    <position x="1140" y="125"/>
-   </graphics>
-  </transition>
-  <transition id="t-1D6C-DB75C-21">
-  <name>
-   <text>Leer_Sensores</text>
-    <graphics>
-     <offset x="10" y="0" />
-    </graphics>
-  </name>
-   <delay>
-    <interval xmlns="http://www.w3.org/1998/Math/MathML" closure="closed-open">
-     <cn>20</cn>
-     <ci>infty</ci>
-    </interval>
-    <graphics>
-     <offset x="0" y="-10" />
-    </graphics>
-   </delay>
-   <graphics>
-    <position x="500" y="110"/>
-   </graphics>
-  </transition>
-  <transition id="t-1D6C-DB761-22">
-  <name>
-   <text>Necesita_Estimulacion</text>
-    <graphics>
-     <offset x="0" y="10" />
-    </graphics>
-  </name>
-   <graphics>
-    <position x="640" y="1040"/>
-   </graphics>
-  </transition>
-  <transition id="t-1D6C-DB766-23">
-  <name>
-   <text>No_Necesita_Estimulacion</text>
-    <graphics>
-     <offset x="0" y="10" />
-    </graphics>
-  </name>
-   <graphics>
-    <position x="855" y="1045"/>
-   </graphics>
-  </transition>
-  <transition id="t-1D6C-DB76B-24">
-  <name>
-   <text>Poner_En_Buffer_Acel</text>
-    <graphics>
-     <offset x="0" y="-10" />
-    </graphics>
-  </name>
-   <label>
-    <text>&lt;A,N&gt;</text>
-    <graphics>
-     <offset x="10" y="-10" />
-    </graphics>
-   </label>
-   <graphics>
-    <position x="435" y="315"/>
-   </graphics>
-  </transition>
-  <transition id="t-1D6C-DB770-25">
-  <name>
-   <text>Poner_En_Buffer_Acel2</text>
-    <graphics>
-     <offset x="0" y="10" />
-    </graphics>
-  </name>
-   <label>
-    <text>&lt;A,N&gt;</text>
-    <graphics>
-     <offset x="10" y="0" />
-    </graphics>
-   </label>
-   <graphics>
-    <position x="435" y="540"/>
-   </graphics>
-  </transition>
-  <transition id="t-1D6C-DB775-26">
-  <name>
-   <text>Poner_En_Buffer_Bat</text>
-    <graphics>
-     <offset x="10" y="0" />
-    </graphics>
-  </name>
-   <label>
-    <text>&lt;A,N&gt;</text>
-    <graphics>
-     <offset x="10" y="-10" />
-    </graphics>
-   </label>
-   <graphics>
-    <position x="1190" y="310"/>
-   </graphics>
-  </transition>
-  <transition id="t-1D6C-DB77B-27">
-  <name>
-   <text>Poner_En_Buffer_Bat2</text>
-    <graphics>
-     <offset x="0" y="10" />
-    </graphics>
-  </name>
-   <label>
-    <text>&lt;A,N&gt;</text>
-    <graphics>
-     <offset x="10" y="0" />
-    </graphics>
-   </label>
-   <graphics>
-    <position x="1190" y="540"/>
-   </graphics>
-  </transition>
-  <transition id="t-1D6C-DB77F-28">
-  <name>
-   <text>Poner_En_Buffer_Met</text>
-    <graphics>
-     <offset x="0" y="-10" />
-    </graphics>
-  </name>
-   <label>
-    <text>&lt;A,N&gt;</text>
-    <graphics>
-     <offset x="10" y="-10" />
-    </graphics>
-   </label>
-   <graphics>
-    <position x="955" y="310"/>
-   </graphics>
-  </transition>
-  <transition id="t-1D6C-DB785-29">
-  <name>
-   <text>Poner_En_Buffer_Met2</text>
-    <graphics>
-     <offset x="0" y="10" />
-    </graphics>
-  </name>
-   <label>
-    <text>&lt;A,N&gt;</text>
-    <graphics>
-     <offset x="10" y="0" />
-    </graphics>
-   </label>
-   <graphics>
-    <position x="955" y="530"/>
-   </graphics>
-  </transition>
-  <transition id="t-1D6C-DB78A-30">
-  <name>
-   <text>Poner_En_Buffer_Pul</text>
-    <graphics>
-     <offset x="0" y="-10" />
-    </graphics>
-  </name>
-   <label>
-    <text>&lt;A,N&gt;</text>
-    <graphics>
-     <offset x="10" y="-10" />
-    </graphics>
-   </label>
-   <graphics>
-    <position x="140" y="310"/>
-   </graphics>
-  </transition>
-  <transition id="t-1D6C-DB78F-31">
-  <name>
-   <text>Poner_En_Buffer_Pul2</text>
-    <graphics>
-     <offset x="0" y="10" />
-    </graphics>
-  </name>
-   <label>
-    <text>&lt;A,N&gt;</text>
-    <graphics>
-     <offset x="10" y="0" />
-    </graphics>
-   </label>
-   <graphics>
-    <position x="140" y="535"/>
-   </graphics>
-  </transition>
-  <transition id="t-1D6C-DB7BE-32">
-  <name>
-   <text>Poner_En_Buffer_Resp</text>
-    <graphics>
-     <offset x="0" y="-10" />
-    </graphics>
-  </name>
-   <label>
-    <text>&lt;A,N&gt;</text>
-    <graphics>
-     <offset x="10" y="-10" />
-    </graphics>
-   </label>
-   <graphics>
-    <position x="695" y="315"/>
-   </graphics>
-  </transition>
-  <transition id="t-1D6C-DB7C4-33">
-  <name>
-   <text>Poner_En_Buffer_Resp2</text>
-    <graphics>
-     <offset x="10" y="10" />
-    </graphics>
-  </name>
-   <label>
-    <text>&lt;A,N&gt;</text>
-    <graphics>
-     <offset x="10" y="0" />
-    </graphics>
-   </label>
-   <graphics>
-    <position x="695" y="535"/>
-   </graphics>
-  </transition>
-  <place id="p-1D6C-DB7CA-34">
-  <name>
-   <text>Pulso_Listo</text>
-    <graphics>
-     <offset x="0" y="10" />
-    </graphics>
-  </name>
-   <graphics>
-    <position x="640" y="1125"/>
-   </graphics>
-  </place>
-  <transition id="t-1D6C-DB7CE-35">
-  <name>
-   <text>Registrar_Shock</text>
-    <graphics>
-     <offset x="-10" y="0" />
-    </graphics>
-  </name>
-   <graphics>
-    <position x="585" y="1335"/>
-   </graphics>
-  </transition>
-  <transition id="t-1D6C-DB7D1-36">
-  <name>
-   <text>Reportar_Err_Acel</text>
-    <graphics>
-     <offset x="0" y="10" />
-    </graphics>
-  </name>
-   <graphics>
-    <position x="320" y="310"/>
-   </graphics>
-  </transition>
-  <transition id="t-1D6C-DB7D5-37">
-  <name>
-   <text>Reportar_Err_Bat</text>
-    <graphics>
-     <offset x="0" y="10" />
-    </graphics>
-  </name>
-   <graphics>
-    <position x="1100" y="310"/>
-   </graphics>
-  </transition>
-  <transition id="t-1D6C-DB7D9-38">
-  <name>
-   <text>Reportar_Err_Calculo</text>
-    <graphics>
-     <offset x="0" y="10" />
-    </graphics>
-  </name>
-   <graphics>
-    <position x="395" y="1035"/>
-   </graphics>
-  </transition>
-  <transition id="t-1D6C-DB7DD-39">
-  <name>
-   <text>Reportar_Err_Met</text>
-    <graphics>
-     <offset x="0" y="10" />
-    </graphics>
-  </name>
-   <graphics>
-    <position x="830" y="310"/>
-   </graphics>
-  </transition>
-  <transition id="t-1D6C-DB7E0-40">
-  <name>
-   <text>Reportar_Err_Pul</text>
-    <graphics>
-     <offset x="0" y="10" />
-    </graphics>
-  </name>
-   <graphics>
-    <position x="60" y="310"/>
-   </graphics>
-  </transition>
-  <transition id="t-1D6C-DB7E4-41">
-  <name>
-   <text>Reportar_Err_Resp</text>
-    <graphics>
-     <offset x="0" y="10" />
-    </graphics>
-  </name>
-   <graphics>
-    <position x="580" y="310"/>
-   </graphics>
-  </transition>
-  <transition id="t-1D6C-DB7E8-42">
-  <name>
-   <text>Reportar_Err_Shock</text>
-    <graphics>
-     <offset x="10" y="0" />
-    </graphics>
-  </name>
-   <graphics>
-    <position x="690" y="1335"/>
-   </graphics>
-  </transition>
-  <place id="p-1D6C-DB7EC-43">
-  <name>
-   <text>Sen_Bat_Disp</text>
-    <graphics>
-     <offset x="10" y="0" />
-    </graphics>
-  </name>
-   <initialMarking>
-    <text>1</text>
-   </initialMarking>
-   <graphics>
-    <position x="1140" y="30"/>
-   </graphics>
-  </place>
-  <place id="p-1D6C-DB7F0-44">
-  <name>
-   <text>Sen_Bat_Ocup</text>
-    <graphics>
-     <offset x="-10" y="0" />
-    </graphics>
-  </name>
-   <graphics>
-    <position x="1015" y="125"/>
-   </graphics>
-  </place>
-  <place id="p-1D6C-DB7F4-45">
-  <name>
-   <text>Sensores_Disp</text>
-    <graphics>
-     <offset x="10" y="0" />
-    </graphics>
-  </name>
-   <initialMarking>
-    <text>1</text>
-   </initialMarking>
-   <graphics>
-    <position x="500" y="30"/>
-   </graphics>
-  </place>
-  <place id="p-1D6C-DB7F7-46">
-  <name>
-   <text>Sensores_Ocup</text>
-    <graphics>
-     <offset x="-10" y="0" />
-    </graphics>
-  </name>
-   <graphics>
-    <position x="390" y="110"/>
-   </graphics>
-  </place>
-  <place id="p-1D6C-DB7FB-47">
-  <name>
-   <text>Telemetria</text>
-    <graphics>
-     <offset x="0" y="-10" />
-    </graphics>
-  </name>
-   <graphics>
-    <position x="755" y="1140"/>
-   </graphics>
-  </place>
-  <place id="p-1D6C-DB7FD-48">
-  <name>
-   <text>Usando_Buffer_Acel</text>
-    <graphics>
-     <offset x="0" y="10" />
-    </graphics>
-  </name>
-   <graphics>
-    <position x="435" y="430"/>
-   </graphics>
-  </place>
-  <place id="p-1D6C-DB814-49">
-  <name>
-   <text>Usando_Buffer_Bat</text>
-    <graphics>
-     <offset x="0" y="10" />
-    </graphics>
-  </name>
-   <graphics>
-    <position x="1190" y="435"/>
-   </graphics>
-  </place>
-  <place id="p-1D6C-DB818-50">
-  <name>
-   <text>Usando_Buffer_Met</text>
-    <graphics>
-     <offset x="0" y="10" />
-    </graphics>
-  </name>
-   <graphics>
-    <position x="955" y="435"/>
-   </graphics>
-  </place>
-  <place id="p-1D6C-DB81C-51">
-  <name>
-   <text>Usando_Buffer_Pul</text>
-    <graphics>
-     <offset x="0" y="10" />
-    </graphics>
-  </name>
-   <graphics>
-    <position x="140" y="425"/>
-   </graphics>
-  </place>
-  <place id="p-1D6C-DB820-52">
-  <name>
-   <text>Usando_Buffer_Resp</text>
-    <graphics>
-     <offset x="0" y="10" />
-    </graphics>
-  </name>
-   <graphics>
-    <position x="695" y="435"/>
-   </graphics>
-  </place>
-  <transition id="t-1D6C-DB824-53">
-  <name>
-   <text>Vaciar_Buffer</text>
-    <graphics>
-     <offset x="-10" y="0" />
-    </graphics>
-  </name>
-   <delay>
-    <interval xmlns="http://www.w3.org/1998/Math/MathML" closure="closed">
-     <cn>200</cn>
-     <cn>205</cn>
-    </interval>
-    <graphics>
-     <offset x="10" y="0" />
-    </graphics>
-   </delay>
-   <graphics>
-    <position x="640" y="885"/>
-   </graphics>
-  </transition>
-  <transition id="t-1D6C-DB829-54">
-  <name>
-   <text>t2</text>
-    <graphics>
-     <offset x="0" y="0" />
-    </graphics>
-  </name>
-   <label>
-    <text>&lt;A,N&gt;</text>
-    <graphics>
-     <offset x="-10" y="0" />
-    </graphics>
-   </label>
-   <graphics>
-    <position x="390" y="30"/>
-   </graphics>
-  </transition>
-  <transition id="t-1D6C-DB82F-55">
-  <name>
-   <text>t3</text>
-    <graphics>
-     <offset x="0" y="0" />
-    </graphics>
-  </name>
-   <label>
-    <text>&lt;A,N&gt;</text>
-    <graphics>
-     <offset x="-10" y="0" />
-    </graphics>
-   </label>
-   <graphics>
-    <position x="1015" y="30"/>
-   </graphics>
-  </transition>
-  <arc id="e-1D6C-DB833-56" source="t-1D6C-DB761-22" target="p-1D6C-DB7FB-47">
-  </arc>
-  <arc id="e-1D6C-DB838-57" source="p-1D6C-DB6A9-3" target="t-1D6C-DB766-23">
-  </arc>
-  <arc id="e-1D6C-DB839-58" source="t-1D6C-DB761-22" target="p-1D6C-DB7CA-34">
-  </arc>
-  <arc id="e-1D6C-DB83A-59" source="p-1D6C-DB6A9-3" target="t-1D6C-DB761-22">
-  </arc>
-  <arc id="e-1D6C-DB83B-60" source="p-1D6C-DB7F4-45" target="t-1D6C-DB75C-21">
-  </arc>
-  <arc id="e-1D6C-DB83D-61" source="p-1D6C-DB7EC-43" target="t-1D6C-DB756-20">
-  </arc>
-  <arc id="e-1D6C-DB83F-62" source="t-1D6C-DB77B-27" target="p-1D6C-DB6CF-13">
-   <graphics>
-    <position x="1057" y="591" />
-    <position x="788" y="681" />
-   </graphics>  </arc>
-  <arc id="e-1D6C-DB846-63" source="p-1D6C-DB6CF-13" target="t-1D6C-DB775-26">
-   <graphics>
-    <position x="805" y="672" />
-    <position x="1169" y="451" />
-   </graphics>  </arc>
-  <arc id="e-1D6C-DB849-64" source="t-1D6C-DB7E0-40" target="p-1D6C-DB6C8-11">
-  </arc>
-  <arc id="e-1D6C-DB84A-65" source="p-1D6C-DB6DE-17" target="t-1D6C-DB7E0-40">
-  </arc>
-  <arc id="e-1D6C-DB84B-66" source="t-1D6C-DB7D1-36" target="p-1D6C-DB6BC-8">
-  </arc>
-  <arc id="e-1D6C-DB84D-67" source="t-1D6C-DB766-23" target="p-1D6C-DB7FB-47">
-  </arc>
-  <arc id="e-1D6C-DB84F-68" source="p-1D6C-DB6D3-14" target="t-1D6C-DB7D1-36">
-  </arc>
-  <arc id="e-1D6C-DB850-69" source="t-1D6C-DB7E4-41" target="p-1D6C-DB6CC-12">
-  </arc>
-  <arc id="e-1D6C-DB851-70" source="p-1D6C-DB6E1-18" target="t-1D6C-DB7E4-41">
-  </arc>
-  <arc id="e-1D6C-DB852-71" source="t-1D6C-DB7DD-39" target="p-1D6C-DB6C5-10">
-  </arc>
-  <arc id="e-1D6C-DB853-72" source="p-1D6C-DB6DA-16" target="t-1D6C-DB7DD-39">
-  </arc>
-  <arc id="e-1D6C-DB855-73" source="t-1D6C-DB77B-27" target="p-1D6C-DB69B-2">
-  </arc>
-  <arc id="e-1D6C-DB856-74" source="p-1D6C-DB814-49" target="t-1D6C-DB77B-27">
-  </arc>
-  <arc id="e-1D6C-DB858-75" source="t-1D6C-DB7D9-38" target="p-1D6C-DB6BA-7">
-  </arc>
-  <arc id="e-1D6C-DB859-76" source="p-1D6C-DB6A9-3" target="t-1D6C-DB7D9-38">
-  </arc>
-  <arc id="e-1D6C-DB87F-77" source="p-1D6C-DB69B-2" target="t-1D6C-DB824-53">
-   <type value="reset"/>
-  </arc>
-  <arc id="e-1D6C-DB880-78" source="t-1D6C-DB756-20" target="p-1D6C-DB6D6-15">
-  </arc>
-  <arc id="e-1D6C-DB882-79" source="t-1D6C-DB785-29" target="p-1D6C-DB69B-2">
-   <graphics>
-    <position x="952" y="608" />
-    <position x="697" y="766" />
-   </graphics>  </arc>
-  <arc id="e-1D6C-DB885-80" source="t-1D6C-DB7C4-33" target="p-1D6C-DB69B-2">
-   <graphics>
-    <position x="707" y="593" />
-    <position x="664" y="753" />
-   </graphics>  </arc>
-  <arc id="e-1D6C-DB888-81" source="t-1D6C-DB770-25" target="p-1D6C-DB69B-2">
-   <graphics>
-    <position x="437" y="594" />
-    <position x="615" y="764" />
-   </graphics>  </arc>
-  <arc id="e-1D6C-DB88A-82" source="t-1D6C-DB78F-31" target="p-1D6C-DB69B-2">
-  </arc>
-  <arc id="e-1D6C-DB88B-83" source="p-1D6C-DB6DA-16" target="t-1D6C-DB77F-28">
-  </arc>
-  <arc id="e-1D6C-DB88D-84" source="t-1D6C-DB77F-28" target="p-1D6C-DB818-50">
-  </arc>
-  <arc id="e-1D6C-DB88E-85" source="t-1D6C-DB7BE-32" target="p-1D6C-DB820-52">
-  </arc>
-  <arc id="e-1D6C-DB88F-86" source="p-1D6C-DB6E1-18" target="t-1D6C-DB7BE-32">
-  </arc>
-  <arc id="e-1D6C-DB892-87" source="p-1D6C-DB6D3-14" target="t-1D6C-DB76B-24">
-  </arc>
-  <arc id="e-1D6C-DB893-88" source="t-1D6C-DB76B-24" target="p-1D6C-DB7FD-48">
-  </arc>
-  <arc id="e-1D6C-DB894-89" source="t-1D6C-DB75C-21" target="p-1D6C-DB6DA-16">
-  </arc>
-  <arc id="e-1D6C-DB895-90" source="p-1D6C-DB6DE-17" target="t-1D6C-DB78A-30">
-  </arc>
-  <arc id="e-1D6C-DB897-91" source="t-1D6C-DB78A-30" target="p-1D6C-DB81C-51">
-  </arc>
-  <arc id="e-1D6C-DB898-92" source="p-1D6C-DB81C-51" target="t-1D6C-DB78F-31">
-  </arc>
-  <arc id="e-1D6C-DB899-93" source="p-1D6C-DB7FD-48" target="t-1D6C-DB770-25">
-  </arc>
-  <arc id="e-1D6C-DB89B-94" source="p-1D6C-DB820-52" target="t-1D6C-DB7C4-33">
-  </arc>
-  <arc id="e-1D6C-DB89C-95" source="p-1D6C-DB818-50" target="t-1D6C-DB785-29">
-  </arc>
-  <arc id="e-1D6C-DB89D-96" source="t-1D6C-DB7C4-33" target="p-1D6C-DB6CF-13">
-   <graphics>
-    <position x="683" y="560" />
-    <position x="658" y="636" />
-   </graphics>  </arc>
-  <arc id="e-1D6C-DB89F-97" source="p-1D6C-DB6CF-13" target="t-1D6C-DB76B-24">
-   <graphics>
-    <position x="586" y="566" />
-    <position x="470" y="286" />
-   </graphics>  </arc>
-  <arc id="e-1D6C-DB8A1-98" source="t-1D6C-DB770-25" target="p-1D6C-DB6CF-13">
-   <graphics>
-    <position x="445" y="583" />
-    <position x="600" y="683" />
-   </graphics>  </arc>
-  <arc id="e-1D6C-DB8A4-99" source="p-1D6C-DB6E5-19" target="t-1D6C-DB7CE-35">
-  </arc>
-  <arc id="e-1D6C-DB8A5-100" source="t-1D6C-DB75C-21" target="p-1D6C-DB6E1-18">
-  </arc>
-  <arc id="e-1D6C-DB8A7-101" source="t-1D6C-DB7CE-35" target="p-1D6C-DB6AD-4">
-  </arc>
-  <arc id="e-1D6C-DB8A8-102" source="t-1D6C-DB7E8-42" target="p-1D6C-DB6B7-6">
-  </arc>
-  <arc id="e-1D6C-DB8A9-103" source="p-1D6C-DB6E5-19" target="t-1D6C-DB7E8-42">
-  </arc>
-  <arc id="e-1D6C-DB8AA-104" source="p-1D6C-DB6D6-15" target="t-1D6C-DB775-26">
-  </arc>
-  <arc id="e-1D6C-DB8AB-105" source="t-1D6C-DB775-26" target="p-1D6C-DB814-49">
-  </arc>
-  <arc id="e-1D6C-DB8AD-106" source="p-1D6C-DB6CF-13" target="t-1D6C-DB78A-30">
-   <graphics>
-    <position x="543" y="689" />
-    <position x="162" y="403" />
-   </graphics>  </arc>
-  <arc id="e-1D6C-DB8B0-107" source="p-1D6C-DB6CF-13" target="t-1D6C-DB77F-28">
-   <graphics>
-    <position x="759" y="590" />
-    <position x="909" y="384" />
-   </graphics>  </arc>
-  <arc id="e-1D6C-DB8B2-108" source="t-1D6C-DB785-29" target="p-1D6C-DB6CF-13">
-   <graphics>
-    <position x="906" y="560" />
-    <position x="711" y="659" />
-   </graphics>  </arc>
-  <arc id="e-1D6C-DB8B4-109" source="t-1D6C-DB78F-31" target="p-1D6C-DB6CF-13">
-   <graphics>
-    <position x="254" y="624" />
-    <position x="594" y="726" />
-   </graphics>  </arc>
-  <arc id="e-1D6C-DB8B7-110" source="p-1D6C-DB6D6-15" target="t-1D6C-DB7D5-37">
-  </arc>
-  <arc id="e-1D6C-DB8B9-111" source="t-1D6C-DB75C-21" target="p-1D6C-DB6D3-14">
-  </arc>
-  <arc id="e-1D6C-DB8BA-112" source="t-1D6C-DB7D5-37" target="p-1D6C-DB6C0-9">
-  </arc>
-  <arc id="e-1D6C-DB8E0-113" source="p-1D6C-DB6CF-13" target="t-1D6C-DB7BE-32">
-   <graphics>
-    <position x="636" y="641" />
-    <position x="645" y="309" />
-   </graphics>  </arc>
-  <arc id="e-1D6C-DB8E2-114" source="p-1D6C-DB7F7-46" target="t-1D6C-DB829-54">
-  </arc>
-  <arc id="e-1D6C-DB8E4-115" source="t-1D6C-DB75C-21" target="p-1D6C-DB7F7-46">
-  </arc>
-  <arc id="e-1D6C-DB8E5-116" source="t-1D6C-DB829-54" target="p-1D6C-DB7F4-45">
-  </arc>
-  <arc id="e-1D6C-DB8E7-117" source="t-1D6C-DB756-20" target="p-1D6C-DB7F0-44">
-  </arc>
-  <arc id="e-1D6C-DB8E8-118" source="p-1D6C-DB7F0-44" target="t-1D6C-DB82F-55">
-  </arc>
-  <arc id="e-1D6C-DB8E9-119" source="t-1D6C-DB82F-55" target="p-1D6C-DB7EC-43">
-  </arc>
-  <arc id="e-1D6C-DB8EA-120" source="t-1D6C-DB824-53" target="p-1D6C-DB6A9-3">
-  </arc>
-  <arc id="e-1D6C-DB8EB-121" source="t-1D6C-DB75C-21" target="p-1D6C-DB6DE-17">
-  </arc>
-  <arc id="e-1D6C-DB8EC-122" source="t-1D6C-DB6B1-5" target="p-1D6C-DB6E5-19">
-  </arc>
-  <arc id="e-1D6C-DB8EE-123" source="p-1D6C-DB7CA-34" target="t-1D6C-DB6B1-5">
-  </arc>
- </page>
- </net>
-</pnml>
+t 954.0 310.0 Poner_En_Buffer_Met n 0 w n {<A,N>} ne
+t 694.0 315.0 Poner_En_Buffer_Resp n 0 w n {<A,N>} ne
+t 579.0 310.0 Reportar_Err_Resp s 0 w n {} ne
+p 1139.0 220.0 Lectura_Fuente 0 n
+t 689.0 1335.0 Reportar_Err_Shock e 0 w n {} ne
+t 639.0 1215.0 Enviar_Shock w 0 w n {<A,N>} e
+p 639.0 1275.0 Lectura_Shock 0 n
+p 394.0 1125.0 Error_Calculo 0 s
+p 689.0 1415.0 Error 0 n
+p 104.0 215.0 Lectura_Pulsacion 0 n
+t 59.0 310.0 Reportar_Err_Pul s 0 w n {} ne
+p 379.0 215.0 Lectura_Acelerometro 0 n
+p 629.0 215.0 Lectura_Respiracion 0 n
+p 889.0 215.0 Lectura_Metabolismo 0 n
+t 139.0 535.0 Poner_En_Buffer_Pul2 s 0 w n {<A,N>} e
+p 319.0 430.0 Error_Lec_Acel 0 n
+p 579.0 435.0 Error_Lect_Resp 0 n
+t 694.0 535.0 Poner_En_Buffer_Resp2 se 0 w n {<A,N>} e
+p 694.0 435.0 Usando_Buffer_Resp 0 s
+p 829.0 435.0 Error_Lect_Meta 0 n
+p 954.0 435.0 Usando_Buffer_Met 0 s
+t 1099.0 310.0 Reportar_Err_Bat s 0 w n {} ne
+t 1189.0 310.0 Poner_En_Buffer_Bat n 0 w n {<A,N>} ne
+p 1099.0 435.0 Error_Lect_Bateria 0 n
+t 1189.0 540.0 Poner_En_Buffer_Bat2 s 0 w n {<A,N>} e
+p 1189.0 435.0 Usando_Buffer_Bat 0 s
+t 319.0 310.0 Reportar_Err_Acel s 0 w n {} ne
+t 829.0 310.0 Reportar_Err_Met s 0 w n {} ne
+t 139.0 310.0 Poner_En_Buffer_Pul n 0 w n {<A,N>} ne
+t 434.0 315.0 Poner_En_Buffer_Acel n 0 w n {<A,N>} ne
+p 434.0 430.0 Usando_Buffer_Acel 0 s
+p 639.0 1125.0 Pulso_Listo 0 s
+t 854.0 1045.0 No_Necesita_Estimulacion s 0 w n {} ne
+p 754.0 1140.0 Telemetria 0 n
+p 584.0 1410.0 Correcto 0 n
+t 584.0 1335.0 Registrar_Shock w 0 w n {} ne
+t 639.0 1040.0 Necesita_Estimulacion s 0 w n {} ne
+t 394.0 1035.0 Reportar_Err_Calculo s 0 w n {} ne
+p 59.0 430.0 Error_Lect_Pul 0 n
+p 139.0 425.0 Usando_Buffer_Pul 0 s
+t 434.0 540.0 Poner_En_Buffer_Acel2 s 0 w n {<A,N>} e
+t 954.0 530.0 Poner_En_Buffer_Met2 s 0 w n {<A,N>} e
+p 1014.0 125.0 Sen_Bat_Ocup 0 w
+p 1139.0 30.0 Sen_Bat_Disp 1 e
+p 389.0 110.0 Sensores_Ocup 0 w
+t 389.0 30.0 t2 c 0 w n {<A,N>} w
+p 499.0 30.0 Sensores_Disp 1 e
+p 634.0 685.0 Exc_Buffer 1 s
+p 639.0 805.0 Buffer 0 w
+p 639.0 980.0 Calculando 0 n
+t 1014.0 30.0 t3 c 0 w n {<A,N>} w
+t 499.0 110.0 Leer_Sensores e 0 w n {} ne
+t 639.0 885.0 Vaciar_Buffer w 200 206 e {} ne
+t 1139.0 125.0 Leer_Sen_Bat n 0 w n {} ne
+e Leer_Sen_Bat Sen_Bat_Ocup 1 n
+e Leer_Sen_Bat Lectura_Fuente 1 n
+e Sen_Bat_Disp Leer_Sen_Bat 1 n
+e Vaciar_Buffer Calculando 1 n
+e t3 Sen_Bat_Disp 1 n
+e Sen_Bat_Ocup t3 1 n
+e t2 Sensores_Disp 1 n
+e Leer_Sensores Sensores_Ocup 1 n
+e Sensores_Ocup t2 1 n
+e Exc_Buffer 0.247106592 55.00909016 Poner_En_Buffer_Resp 0.479576724 62.51399843 1 n
+e Reportar_Err_Bat Error_Lect_Bateria 1 n
+e Lectura_Fuente Reportar_Err_Bat 1 n
+e Poner_En_Buffer_Pul2 0.8944044746 180.2359565 Exc_Buffer 0.625 72.12489168 1 n
+e Poner_En_Buffer_Met2 0.5886691006 71.86793444 Exc_Buffer 0.053210035 100.5683847 1 n
+e Exc_Buffer 0.104208225 195.4123845 Poner_En_Buffer_Met 0.6617196803 108.2266141 1 n
+e Exc_Buffer 0.5069154248 115.1086443 Poner_En_Buffer_Pul 0.7876956511 119.3314711 1 n
+e Poner_En_Buffer_Bat Usando_Buffer_Bat 1 n
+e Lectura_Fuente Poner_En_Buffer_Bat 1 n
+e Lectura_Shock Reportar_Err_Shock 1 n
+e Reportar_Err_Shock Error 1 n
+e Registrar_Shock Correcto 1 n
+e Lectura_Shock Registrar_Shock 1 n
+e Poner_En_Buffer_Acel2 0.7875996013 55.54277633 Exc_Buffer 0.489165295 44.10215414 1 n
+e Exc_Buffer 0.311844431 161.0031056 Poner_En_Buffer_Acel 0.109137241 56.85068161 1 n
+e Poner_En_Buffer_Resp2 0.6782750223 34.43835072 Exc_Buffer 0.179369794 67.54257916 1 n
+e Usando_Buffer_Met Poner_En_Buffer_Met2 1 n
+e Usando_Buffer_Resp Poner_En_Buffer_Resp2 1 n
+e Usando_Buffer_Acel Poner_En_Buffer_Acel2 1 n
+e Usando_Buffer_Pul Poner_En_Buffer_Pul2 1 n
+e Poner_En_Buffer_Pul Usando_Buffer_Pul 1 n
+e Lectura_Pulsacion Poner_En_Buffer_Pul 1 n
+e Poner_En_Buffer_Acel Usando_Buffer_Acel 1 n
+e Lectura_Acelerometro Poner_En_Buffer_Acel 1 n
+e Lectura_Respiracion Poner_En_Buffer_Resp 1 n
+e Poner_En_Buffer_Resp Usando_Buffer_Resp 1 n
+e Poner_En_Buffer_Met Usando_Buffer_Met 1 n
+e Lectura_Metabolismo Poner_En_Buffer_Met 1 n
+e Poner_En_Buffer_Pul2 Buffer 1 n
+e Poner_En_Buffer_Acel2 0.7547494837 67.0298441 Buffer 0.337147236 60.02603602 1 n
+e Poner_En_Buffer_Resp2 0.782254129 74.52516354 Buffer 0.181180165 71.58910532 1 n
+e Poner_En_Buffer_Met2 0.7434406259 97.08243919 Buffer 0.095500958 86.33148325 1 n
+e Buffer Vaciar_Buffer !1 n
+e Calculando Reportar_Err_Calculo 1 n
+e Reportar_Err_Calculo Error_Calculo 1 n
+e Usando_Buffer_Bat Poner_En_Buffer_Bat2 1 n
+e Poner_En_Buffer_Bat2 Buffer 1 n
+e Lectura_Metabolismo Reportar_Err_Met 1 n
+e Reportar_Err_Met Error_Lect_Meta 1 n
+e Lectura_Respiracion Reportar_Err_Resp 1 n
+e Reportar_Err_Resp Error_Lect_Resp 1 n
+e Lectura_Acelerometro Reportar_Err_Acel 1 n
+e Reportar_Err_Acel Error_Lec_Acel 1 n
+e Lectura_Pulsacion Reportar_Err_Pul 1 n
+e Reportar_Err_Pul Error_Lect_Pul 1 n
+e Exc_Buffer 0.011988965 212.6029163 Poner_En_Buffer_Bat 0.7266573025 177.9100897 1 n
+e Poner_En_Buffer_Bat2 0.5585659849 177.9100897 Exc_Buffer 0.004165408 191.0654338 1 n
+e Sensores_Disp Leer_Sensores 1 n
+e Calculando Necesita_Estimulacion 1 n
+e Necesita_Estimulacion Pulso_Listo 1 n
+e Calculando No_Necesita_Estimulacion 1 n
+e Pulso_Listo Enviar_Shock 1 n
+e Enviar_Shock Lectura_Shock 1 n
+e Leer_Sensores Lectura_Pulsacion 1 n
+e Leer_Sensores Lectura_Acelerometro 1 n
+e Leer_Sensores Lectura_Respiracion 1 n
+e Leer_Sensores Lectura_Metabolismo 1 n
+e No_Necesita_Estimulacion Telemetria 1 n
+e Necesita_Estimulacion Telemetria 1 n
+h PacemakerPetriNet
+
+

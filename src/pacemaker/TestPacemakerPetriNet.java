@@ -2,6 +2,7 @@ package pacemaker;
 
 import org.unc.lac.javapetriconcurrencymonitor.monitor.PetriMonitor;
 import org.unc.lac.javapetriconcurrencymonitor.monitor.policies.FirstInLinePolicy;
+import org.unc.lac.javapetriconcurrencymonitor.monitor.policies.RandomPolicy;
 import org.unc.lac.javapetriconcurrencymonitor.petrinets.TimedPetriNet;
 import org.unc.lac.javapetriconcurrencymonitor.petrinets.factory.PetriNetFactory;
 import org.unc.lac.javapetriconcurrencymonitor.petrinets.factory.PetriNetFactory.petriNetType;
@@ -161,7 +162,7 @@ public class TestPacemakerPetriNet {
 		
 		////////////////////////////////////////////////////////////////////////////////////////
 		// Aqui se duerme al hilo principal, con el fin de dejar a los demas hilos que ejecuten la red
-		int timeToSleep = 7000;
+		int timeToSleep = 6000;
 		try {
 			Thread.sleep(timeToSleep);
 		} catch (InterruptedException e) {

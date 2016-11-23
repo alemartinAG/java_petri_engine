@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pnml xmlns="http://www.pnml.org/version-2009/grammar/pnml">
+ <net id="n-178C-CCEBD-0" type ="http://www.laas.fr/tina/tpn">
+  <name>
+   <text>timedPetriWithAutomaticTransitions</text>
+  </name>
+ <page id="g-178C-CCECA-1">
+  <place id="p-178C-CCECC-2">
+  <name>
+   <text>p0</text>
+    <graphics>
+     <offset x="0" y="-10" />
+    </graphics>
+  </name>
+   <initialMarking>
+    <text>1</text>
+   </initialMarking>
+   <graphics>
+    <position x="155" y="50"/>
+   </graphics>
+  </place>
+  <place id="p-178C-CCEDB-3">
+  <name>
+   <text>p1</text>
+    <graphics>
+     <offset x="0" y="-10" />
+    </graphics>
+  </name>
+   <graphics>
+    <position x="30" y="140"/>
+   </graphics>
+  </place>
+  <place id="p-178C-CCEDE-4">
+  <name>
+   <text>p2</text>
+    <graphics>
+     <offset x="0" y="-10" />
+    </graphics>
+  </name>
+   <graphics>
+    <position x="155" y="230"/>
+   </graphics>
+  </place>
+  <place id="p-178C-CCEE1-5">
+  <name>
+   <text>p3</text>
+    <graphics>
+     <offset x="0" y="-10" />
+    </graphics>
+  </name>
+   <graphics>
+    <position x="155" y="375"/>
+   </graphics>
+  </place>
+  <place id="p-178C-CCEE3-6">
+  <name>
+   <text>p4</text>
+    <graphics>
+     <offset x="0" y="-10" />
+    </graphics>
+  </name>
+   <graphics>
+    <position x="280" y="450"/>
+   </graphics>
+  </place>
+  <transition id="t-178C-CCEE6-7">
+  <name>
+   <text>t0</text>
+    <graphics>
+     <offset x="0" y="0" />
+    </graphics>
+  </name>
+   <delay>
+    <interval xmlns="http://www.w3.org/1998/Math/MathML" closure="closed-open">
+     <cn>80</cn>
+     <ci>infty</ci>
+    </interval>
+    <graphics>
+     <offset x="0" y="-10" />
+    </graphics>
+   </delay>
+   <graphics>
+    <position x="155" y="140"/>
+   </graphics>
+  </transition>
+  <transition id="t-178C-CCEEB-8">
+  <name>
+   <text>t1</text>
+    <graphics>
+     <offset x="0" y="0" />
+    </graphics>
+  </name>
+   <label>
+    <text>&lt;A,N&gt;</text>
+    <graphics>
+     <offset x="10" y="-10" />
+    </graphics>
+   </label>
+   <graphics>
+    <position x="155" y="300"/>
+   </graphics>
+  </transition>
+  <transition id="t-178C-CCEEF-9">
+  <name>
+   <text>t2</text>
+    <graphics>
+     <offset x="0" y="0" />
+    </graphics>
+  </name>
+   <label>
+    <text>&lt;A,N&gt;</text>
+    <graphics>
+     <offset x="10" y="-10" />
+    </graphics>
+   </label>
+   <graphics>
+    <position x="155" y="450"/>
+   </graphics>
+  </transition>
+  <transition id="t-178C-CCEF2-10">
+  <name>
+   <text>t3</text>
+    <graphics>
+     <offset x="0" y="0" />
+    </graphics>
+  </name>
+   <label>
+    <text>&lt;A,N&gt;</text>
+    <graphics>
+     <offset x="10" y="-10" />
+    </graphics>
+   </label>
+   <graphics>
+    <position x="30" y="50"/>
+   </graphics>
+  </transition>
+  <arc id="e-178C-CCEF6-11" source="t-178C-CCEEF-9" target="p-178C-CCEE3-6">
+  </arc>
+  <arc id="e-178C-CCEF9-12" source="p-178C-CCEE1-5" target="t-178C-CCEEF-9">
+  </arc>
+  <arc id="e-178C-CCEFA-13" source="t-178C-CCEEB-8" target="p-178C-CCEE1-5">
+  </arc>
+  <arc id="e-178C-CCEFB-14" source="p-178C-CCEDE-4" target="t-178C-CCEEB-8">
+  </arc>
+  <arc id="e-178C-CCEFC-15" source="t-178C-CCEE6-7" target="p-178C-CCEDE-4">
+  </arc>
+  <arc id="e-178C-CCEFD-16" source="t-178C-CCEF2-10" target="p-178C-CCECC-2">
+  </arc>
+  <arc id="e-178C-CCEFE-17" source="p-178C-CCEDB-3" target="t-178C-CCEF2-10">
+  </arc>
+  <arc id="e-178C-CCEFF-18" source="t-178C-CCEE6-7" target="p-178C-CCEDB-3">
+  </arc>
+  <arc id="e-178C-CCF00-19" source="p-178C-CCECC-2" target="t-178C-CCEE6-7">
+  </arc>
+ </page>
+ </net>
+</pnml>
