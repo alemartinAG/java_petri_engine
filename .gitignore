@@ -13,6 +13,7 @@ hs_err_pid*
 
 # eclipse project files
 .project
+.idea/
 .metadata
 bin/**
 tmp/**
