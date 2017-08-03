@@ -4,21 +4,21 @@ import java.util.Arrays;
 
 import org.unc.lac.javapetriconcurrencymonitor.exceptions.NotInitializedPetriNetException;
 import org.unc.lac.javapetriconcurrencymonitor.exceptions.PetriNetException;
-import org.unc.lac.javapetriconcurrencymonitor.petrinets.components.Arc;
-import org.unc.lac.javapetriconcurrencymonitor.petrinets.components.Place;
-import org.unc.lac.javapetriconcurrencymonitor.petrinets.components.Transition;
+import org.unc.lac.javapetriconcurrencymonitor.petrinets.components.MArc;
+import org.unc.lac.javapetriconcurrencymonitor.petrinets.components.MPlace;
+import org.unc.lac.javapetriconcurrencymonitor.petrinets.components.MTransition;
 
 
-public class TimedPetriNet extends PetriNet{
+public class TimedPetriNet extends RootPetriNet{
 	
 	/**
-	 * Constructs a TimedPetriNet object, which is a {@link PetriNet} object with added time semantics
+	 * Constructs a TimedPetriNet object, which is a {@link RootPetriNet} object with added time semantics
 	 * The enabled transitions are not calculated at initialization time, so
 	 * before firing the first transition, they must be calculated {@link TimedPetriNet#initializePetriNet()}.
 	 * Other way to start times is firing a non timed transition before a timed transition
-	 * @see PetriNet#PetriNet(Place[], Transition[], Arc[], Integer[], Integer[][], Integer[][], Integer[][], Boolean[][], Boolean[][], Integer[][])
+	 * @see RootPetriNet#PetriNet(MPlace[], MTransition[], MArc[], Integer[], Integer[][], Integer[][], Integer[][], Boolean[][], Boolean[][], Integer[][])
 	 */
-	public TimedPetriNet(Place[] _places, Transition[] _transitions, Arc[] _arcs, Integer[] _initialMarking,
+	public TimedPetriNet(MPlace[] _places, MTransition[] _transitions, MArc[] _arcs, Integer[] _initialMarking,
 			Integer[][] _preI, Integer[][] _posI, Integer[][] _I, Boolean[][] _inhibition, Boolean[][] _resetMatrix, Integer[][] _readerMatrix) {
 		super(_places, _transitions, _arcs, _initialMarking, _preI, _posI, _I, _inhibition, _resetMatrix, _readerMatrix);
 		enabledTransitions = new boolean[_transitions.length];
@@ -36,7 +36,7 @@ public class TimedPetriNet extends PetriNet{
 	 * @throws IllegalArgumentException If the index is negative or greater than the last transition index.
 	 * @throws PetriNetException If an error regarding the petri occurs, for instance if the net hasn't been initialized before calling this method.
 	 * @see TimedPetriNet#initializePetriNet()
-	 * @see PetriNet#fire(int)
+	 * @see RootPetriNet#fire(int)
 	 */
 	public PetriNetFireOutcome fire(int transitionIndex) throws IllegalArgumentException, PetriNetException{
 		try{
@@ -57,9 +57,9 @@ public class TimedPetriNet extends PetriNet{
 	 * @throws PetriNetException If an error regarding the petri occurs, for instance if the net hasn't been initialized before calling this method.
 	 * @throws IllegalArgumentException If the given transition is null or its index doesn't match any existing transition
 	 * @see TimedPetriNet#initializePetriNet()
-	 * @see PetriNet#fire(Transition)
+	 * @see RootPetriNet#fire(MTransition)
 	 */
-	public PetriNetFireOutcome fire(final Transition t) throws IllegalArgumentException, PetriNetException{
+	public PetriNetFireOutcome fire(final MTransition t) throws IllegalArgumentException, PetriNetException{
 		if(t == null){
 			throw new IllegalArgumentException("Tried to fire null transition");
 		}
@@ -81,11 +81,11 @@ public class TimedPetriNet extends PetriNet{
 	 * Computes the enabled transitions, setting the enable times for new enabled transitions only
 	 * If a transition was already enabled, its timespan is not updated
 	 * @return the boolean array with enabled transitions
-	 * @see PetriNet#computeEnabledTransitions()
+	 * @see RootPetriNet#computeEnabledTransitions()
 	 */
 	protected final boolean[] computeEnabledTransitions(){
 		boolean[] _enabledTransitions = new boolean[transitions.length];
-		for(Transition t : transitions){
+		for(MTransition t : transitions){
 			int transitionIndex = t.getIndex();
 			boolean transitionEnabled = isEnabled(t);
 			_enabledTransitions[transitionIndex] = transitionEnabled;

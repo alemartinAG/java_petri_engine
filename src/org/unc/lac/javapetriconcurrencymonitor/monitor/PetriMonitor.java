@@ -1,6 +1,7 @@
 package org.unc.lac.javapetriconcurrencymonitor.monitor;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -8,8 +9,8 @@ import org.unc.lac.javapetriconcurrencymonitor.errors.IllegalTransitionFiringErr
 import org.unc.lac.javapetriconcurrencymonitor.exceptions.NotInitializedPetriNetException;
 import org.unc.lac.javapetriconcurrencymonitor.exceptions.PetriNetException;
 import org.unc.lac.javapetriconcurrencymonitor.monitor.policies.TransitionsPolicy;
-import org.unc.lac.javapetriconcurrencymonitor.petrinets.PetriNet;
-import org.unc.lac.javapetriconcurrencymonitor.petrinets.components.Transition;
+import org.unc.lac.javapetriconcurrencymonitor.petrinets.RootPetriNet;
+import org.unc.lac.javapetriconcurrencymonitor.petrinets.components.MTransition;
 import org.unc.lac.javapetriconcurrencymonitor.queues.FairQueue;
 import org.unc.lac.javapetriconcurrencymonitor.queues.VarCondQueue;
 import org.unc.lac.javapetriconcurrencymonitor.utils.PriorityBinaryLock;
@@ -25,7 +26,7 @@ import rx.subjects.PublishSubject;
 public class PetriMonitor {
 
 	/** Petri Net to command the monitor orchestration */
-	private PetriNet petri;
+	private RootPetriNet petri;
 	/** Mutex for the monitor access with a FIFO queue associated*/
 	private PriorityBinaryLock inQueue = new PriorityBinaryLock();
 	/** Condition variable queues where locked threads will wait */
@@ -35,7 +36,7 @@ public class PetriMonitor {
 	private TransitionsPolicy transitionsPolicy;
 	/** A PublishSubject who sends events for informed transitions
 	 * Observers have to explicitly subscribe to an informed transition's events.
-	 * @see #subscribeToTransition(Transition, Observer)*/
+	 * @see #subscribeToTransition(MTransition, Observer)*/
 	private PublishSubject<String> informedTransitionsObservable;
 	
 	/** Contains true in the nth position if a thread is waiting for the nth transition's time span to occur **/
@@ -48,7 +49,7 @@ public class PetriMonitor {
 	private final static String INDEX = "index";
 	private final static String NAME = "name";
 
-	public PetriMonitor(final PetriNet _petri, TransitionsPolicy _policy) {
+	public PetriMonitor(final RootPetriNet _petri, TransitionsPolicy _policy) {
 		if(_petri == null || _policy == null){
 			throw new IllegalArgumentException(this.getClass().getName() + " constructor. Invalid arguments");
 		}
@@ -97,9 +98,9 @@ public class PetriMonitor {
 	 * @throws NotInitializedPetriNetException when firing a timed transition before initializing the petri net
 	 * @throws IllegalTransitionFiringError when an request to fire an automatic transition arrives
 	 * @throws PetriNetException If an error regarding petri nets occurs.
-	 * @see PetriNet#fire(Transition, boolean)
+	 * @see RootPetriNet#fire(MTransition, boolean)
 	 */
-	public void fireTransition(final Transition transitionToFire) throws IllegalTransitionFiringError, NotInitializedPetriNetException, PetriNetException{
+	public void fireTransition(final MTransition transitionToFire) throws IllegalTransitionFiringError, NotInitializedPetriNetException, PetriNetException{
 		fireTransition(transitionToFire, false);
 	}
 
@@ -125,9 +126,9 @@ public class PetriMonitor {
 	 * @throws IllegalTransitionFiringError when an request to fire an automatic transition arrives
 	 * @throws NotInitializedPetriNetException when firing a timed transition before initializing the petri net
 	 * @throws PetriNetException If an error regarding petri nets occurs.
-	 * @see PetriNet#fire(Transition, boolean)
+	 * @see RootPetriNet#fire(MTransition, boolean)
 	 */
-	public void fireTransition(final Transition transitionToFire, boolean perennialFire) throws IllegalTransitionFiringError, NotInitializedPetriNetException, PetriNetException{
+	public void fireTransition(final MTransition transitionToFire, boolean perennialFire) throws IllegalTransitionFiringError, NotInitializedPetriNetException, PetriNetException{
 		// An attempt to fire an automatic transition is a severe error and the application should stop automatically
 		if(transitionToFire.getLabel().isAutomatic()){
 			throw new IllegalTransitionFiringError("An automatic transition has tried to be fired manually");
@@ -154,7 +155,7 @@ public class PetriMonitor {
 	 * @throws IllegalTransitionFiringError If transitionName matches an automatic transition
 	 * @throws NotInitializedPetriNetException when firing a timed transition before initializing the petri net
 	 * @throws PetriNetException If an error regarding petri nets occurs.
-	 * @see PetriMonitor#fireTransition(Transition)
+	 * @see PetriMonitor#fireTransition(MTransition)
 	 */
 	public void fireTransition(final String transitionName) throws IllegalArgumentException, IllegalTransitionFiringError, NotInitializedPetriNetException, PetriNetException {
 		fireTransition(transitionName, false);
@@ -167,7 +168,7 @@ public class PetriMonitor {
 	 * @throws IllegalTransitionFiringError If transitionName matches an automatic transition
 	 * @throws NotInitializedPetriNetException when firing a timed transition before initializing the petri net
 	 * @throws PetriNetException If an error regarding petri nets occurs.
-	 * @see PetriMonitor#fireTransition(Transition)
+	 * @see PetriMonitor#fireTransition(MTransition)
 	 */
 	public void fireTransition(final String transitionName, boolean perennialFire) throws IllegalArgumentException, IllegalTransitionFiringError, NotInitializedPetriNetException, PetriNetException {
 		fireTransition(petri.getTransition(transitionName), perennialFire);
@@ -219,11 +220,11 @@ public class PetriMonitor {
 	 * @throws IllegalArgumentException if the given transition is not informed or the transition or observer is null
 	 * @return a Subscription object used to unsubscribe
 	 */
-	public Subscription subscribeToTransition(final Transition _transition, final Observer<String> _observer) throws IllegalArgumentException{
+	public Subscription subscribeToTransition(final MTransition _transition, final Observer<String> _observer) throws IllegalArgumentException{
 		if(_transition == null || _observer == null){
 			throw new IllegalArgumentException("invalid transition or observer recieved");
 		} else if (!_transition.getLabel().isInformed()){
-			throw new IllegalArgumentException("Transition " + _transition.getIndex() + " is not informed");
+			throw new IllegalArgumentException("Transition " + _transition.getName() + " is not informed");
 		}
 		// the subscription is made only to the specified transition filtering by id
 		return informedTransitionsObservable
@@ -314,7 +315,7 @@ public class PetriMonitor {
 	 * @param t the transition to send an event about
 	 * @throws IllegalArgumentException If t is not informed
 	 */
-	private void sendEventAfterFiring(Transition t) throws IllegalArgumentException{
+	private void sendEventAfterFiring(MTransition t) throws IllegalArgumentException{
 		if(!t.getLabel().isInformed()){
 			throw new IllegalArgumentException("Non-informed transitions cannot send events");
 		}
@@ -343,13 +344,14 @@ public class PetriMonitor {
 	 * @throws NotInitializedPetriNetException If the net hasn't been initialized before calling this method.
 	 * @throws PetriNetException If an error regarding petri nets occurs.
 	 */
-	private boolean internalFireTransition(Transition transitionToFire, boolean perennialFire) throws PetriNetException, NotInitializedPetriNetException{
+	private boolean internalFireTransition(MTransition transitionToFire, boolean perennialFire) throws PetriNetException, NotInitializedPetriNetException{
 		boolean releaseLock = true;
 		boolean keepFiring = true;
 		boolean sleptByItselfForThisTransition = false;
 
 		int transitionIndex = transitionToFire.getIndex();
 
+		long timeElapsed = (new Date()).getTime();
 		while(keepFiring){
 			keepFiring = petri.getEnabledTransitions()[transitionToFire.getIndex()];
 			if(keepFiring){				
@@ -357,6 +359,7 @@ public class PetriMonitor {
 					switch(petri.fire(transitionToFire)) {
 					case SUCCESS:
 						//the transition was fired successfully. If it's informed let's send an event
+						System.out.println("now!" + ((new Date()).getTime() - timeElapsed));
 						try{
 							sendEventAfterFiring(transitionToFire);
 						} catch (IllegalArgumentException e){
@@ -400,6 +403,7 @@ public class PetriMonitor {
 						break;
 					case TIMED_BEFORE_TIMESPAN:
 						if(anyThreadSleepingforTransition[transitionIndex].compareAndSet(false, true)){
+							System.out.println("not yet!");
 							// The calling thread came before time span, and there is nobody sleeping waiting for this transition,
 							// release the input mutex and sleep here until the time has come.
 							inQueue.unlock();
@@ -451,7 +455,7 @@ public class PetriMonitor {
 		return releaseLock;
 	}
 	
-	private void sleepInTransitionQueue(final Transition transitionToFire, boolean sleptByItselfForThisTransition){
+	private void sleepInTransitionQueue(final MTransition transitionToFire, boolean sleptByItselfForThisTransition){
 		
 		inQueue.unlock();
 		if(sleptByItselfForThisTransition){
@@ -472,7 +476,7 @@ public class PetriMonitor {
 	 * The calling thread will sleep by itself until the given transition's timespan is reached.
 	 * @param transitionToFire
 	 */
-	private void handleFiringBeforeTimespan(Transition transitionToFire){
+	private void handleFiringBeforeTimespan(MTransition transitionToFire){
 		long enablingTime = transitionToFire.getEnablingTime();
 		long fireAttemptTime = System.currentTimeMillis();
 		

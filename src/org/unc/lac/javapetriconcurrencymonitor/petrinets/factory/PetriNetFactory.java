@@ -10,14 +10,14 @@ import org.javatuples.Triplet;
 import org.unc.lac.javapetriconcurrencymonitor.errors.CannotCreatePetriNetError;
 import org.unc.lac.javapetriconcurrencymonitor.exceptions.BadPnmlFormatException;
 import org.unc.lac.javapetriconcurrencymonitor.parser.PnmlParser;
-import org.unc.lac.javapetriconcurrencymonitor.petrinets.PetriNet;
+import org.unc.lac.javapetriconcurrencymonitor.petrinets.RootPetriNet;
 import org.unc.lac.javapetriconcurrencymonitor.petrinets.PlaceTransitionPetriNet;
 import org.unc.lac.javapetriconcurrencymonitor.petrinets.TimedPetriNet;
-import org.unc.lac.javapetriconcurrencymonitor.petrinets.components.Arc;
+import org.unc.lac.javapetriconcurrencymonitor.petrinets.components.MArc;
 import org.unc.lac.javapetriconcurrencymonitor.petrinets.components.PetriNode;
-import org.unc.lac.javapetriconcurrencymonitor.petrinets.components.Place;
-import org.unc.lac.javapetriconcurrencymonitor.petrinets.components.Transition;
-import org.unc.lac.javapetriconcurrencymonitor.petrinets.components.Arc.ArcType;
+import org.unc.lac.javapetriconcurrencymonitor.petrinets.components.MPlace;
+import org.unc.lac.javapetriconcurrencymonitor.petrinets.components.MTransition;
+import org.unc.lac.javapetriconcurrencymonitor.petrinets.components.MArc.ArcType;
 
 	/**
 	 * PetriNet factory. Gets info from PNML file. Calls makePetriNet to get a PetriNet components
@@ -57,9 +57,9 @@ import org.unc.lac.javapetriconcurrencymonitor.petrinets.components.Arc.ArcType;
 		 * @throws CannotCreatePetriNetError If any a non supported arc type is given,
 		 * or if a transition that has a reset arc as input has another arc as input
 		 */
-		public PetriNet makePetriNet(petriNetType type) throws CannotCreatePetriNetError{
+		public RootPetriNet makePetriNet(petriNetType type) throws CannotCreatePetriNetError{
 			
-			Quartet<Place[], Transition[], Arc[], Integer[]> petriComponents = pnmlInfoToPetriNetComponents();
+			Quartet<MPlace[], MTransition[], MArc[], Integer[]> petriComponents = pnmlInfoToPetriNetComponents();
 			Sextet<Integer[][], Integer[][], Integer[][], Boolean[][], Boolean[][], Integer[][]> petriMatrices =
 					petriNetComponentsToMatrices(petriComponents.getValue0(), petriComponents.getValue1(), petriComponents.getValue2());
 			
@@ -80,9 +80,9 @@ import org.unc.lac.javapetriconcurrencymonitor.petrinets.components.Arc.ArcType;
 		 * @return a 4-tuple containig (places, transitions, arcs, initial marking)
 		 * @throws CannotCreatePetriNetError If an error occurs during parsing
 		 */
-		protected Quartet<Place[], Transition[], Arc[], Integer[]> pnmlInfoToPetriNetComponents() throws CannotCreatePetriNetError{
+		protected Quartet<MPlace[], MTransition[], MArc[], Integer[]> pnmlInfoToPetriNetComponents() throws CannotCreatePetriNetError{
 			try{
-				Triplet<Place[], Transition[], Arc[]> ret = reader.parseFileAndGetPetriComponents();
+				Triplet<MPlace[], MTransition[], MArc[]> ret = reader.parseFileAndGetPetriComponents();
 			
 				return ret.add(getMarkingFromPlaces(ret.getValue0()));
 			} catch (BadPnmlFormatException e){
@@ -99,10 +99,10 @@ import org.unc.lac.javapetriconcurrencymonitor.petrinets.components.Arc.ArcType;
 		 * @return a 5-tuple containing (Pre matrix, Post matrix, Incidence matrix, Inhibition matrix, Reset matrix)
 		 * @throws CannotCreatePetriNetError If any a non supported arc type is given,
 		 * or if a transition that has a reset arc as input has another arc as input
-		 * @see org.unc.lac.javapetriconcurrencymonitor.petrinets.components.Arc.ArcType
+		 * @see org.unc.lac.javapetriconcurrencymonitor.petrinets.components.MArc.ArcType
 		 */
 		protected Sextet<Integer[][], Integer[][], Integer[][], Boolean[][], Boolean[][], Integer[][]> petriNetComponentsToMatrices(
-				Place[] places, Transition[] transitions, Arc[] arcs) throws CannotCreatePetriNetError{
+				MPlace[] places, MTransition[] transitions, MArc[] arcs) throws CannotCreatePetriNetError{
 			final int placesAmount = places.length;
 			final int transitionsAmount = transitions.length;
 			Integer[][] pre = new Integer[placesAmount][transitionsAmount];
@@ -124,7 +124,7 @@ import org.unc.lac.javapetriconcurrencymonitor.petrinets.components.Arc.ArcType;
 				}
 			}
 			
-			for(Arc arc : arcs){
+			for(MArc arc : arcs){
 				PetriNode source = arc.getSource();
 				PetriNode target = arc.getTarget();
 				ArcType type = arc.getType();
@@ -133,7 +133,7 @@ import org.unc.lac.javapetriconcurrencymonitor.petrinets.components.Arc.ArcType;
 				int arcWeight = arc.getWeight();
 				switch(type){
 				case NORMAL:
-					if(source.getClass().equals(Place.class)){
+					if(source.getClass().equals(MPlace.class)){
 						// arc goes from place to transition, let's fill the pre-incidence matrix
 						pre[sourceIndex][targetIndex] = arcWeight;
 						// since inc = pos - pre, here substract the arcWeight from the incidence matrix
@@ -165,10 +165,10 @@ import org.unc.lac.javapetriconcurrencymonitor.petrinets.components.Arc.ArcType;
 			// Now let's check if any transition that has a reset arc as input also has any other input arc
 			// That is an illegal condition
 			
-			Arc[] resetArcs = Arrays.stream(arcs)
-					.filter((Arc a) -> a.getType() == ArcType.RESET)
-					.toArray((int size) -> new Arc[size]);
-			for(Arc resetArc : resetArcs){
+			MArc[] resetArcs = Arrays.stream(arcs)
+					.filter((MArc a) -> a.getType() == ArcType.RESET)
+					.toArray((int size) -> new MArc[size]);
+			for(MArc resetArc : resetArcs){
 				int placeIndex = resetArc.getSource().getIndex();
 				int transitionIndex = resetArc.getTarget().getIndex();
 				for(int i = 0; i < placesAmount; i++){
@@ -190,9 +190,9 @@ import org.unc.lac.javapetriconcurrencymonitor.petrinets.components.Arc.ArcType;
 		 * @param places the places to check
 		 * @return place's initial marking
 		 */
-		protected Integer[] getMarkingFromPlaces(Place[] places){
+		protected Integer[] getMarkingFromPlaces(MPlace[] places){
 			ArrayList<Integer> initialMarking = new ArrayList<Integer>(places.length);
-			for(Place place : places){
+			for(MPlace place : places){
 				initialMarking.add(place.getMarking());
 			}
 			Integer[] ret = new Integer[initialMarking.size()];

@@ -8,13 +8,13 @@ import org.javatuples.Triplet;
 import org.unc.lac.javapetriconcurrencymonitor.errors.DuplicatedIdError;
 import org.unc.lac.javapetriconcurrencymonitor.errors.DuplicatedNameError;
 import org.unc.lac.javapetriconcurrencymonitor.exceptions.BadPnmlFormatException;
-import org.unc.lac.javapetriconcurrencymonitor.petrinets.components.Arc;
+import org.unc.lac.javapetriconcurrencymonitor.petrinets.components.MArc;
 import org.unc.lac.javapetriconcurrencymonitor.petrinets.components.Label;
 import org.unc.lac.javapetriconcurrencymonitor.petrinets.components.PetriNode;
-import org.unc.lac.javapetriconcurrencymonitor.petrinets.components.Place;
+import org.unc.lac.javapetriconcurrencymonitor.petrinets.components.MPlace;
 import org.unc.lac.javapetriconcurrencymonitor.petrinets.components.TimeSpan;
-import org.unc.lac.javapetriconcurrencymonitor.petrinets.components.Transition;
-import org.unc.lac.javapetriconcurrencymonitor.petrinets.components.Arc.ArcType;
+import org.unc.lac.javapetriconcurrencymonitor.petrinets.components.MTransition;
+import org.unc.lac.javapetriconcurrencymonitor.petrinets.components.MArc.ArcType;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
@@ -82,11 +82,11 @@ public class PnmlParser{
 	 * @throws DuplicatedNameError If two or more places or transitions share names (empty names are not a problem)
 	 * @throws DuplicatedIdError If two or more places or transitions share ids
 	 */
-	public Triplet<Place[], Transition[], Arc[]> parseFileAndGetPetriComponents() throws BadPnmlFormatException, DuplicatedNameError, DuplicatedIdError {
+	public Triplet<MPlace[], MTransition[], MArc[]> parseFileAndGetPetriComponents() throws BadPnmlFormatException, DuplicatedNameError, DuplicatedIdError {
 		try {
 			placesIndex = 0;
 			transitionsIndex = 0;
-			Triplet<Place[], Transition[], Arc[]> ret = null;
+			Triplet<MPlace[], MTransition[], MArc[]> ret = null;
 			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
 			DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
 			Document doc = dBuilder.parse(pnmlFile);
@@ -133,10 +133,10 @@ public class PnmlParser{
 	 * @throws DuplicatedNameError If two or more places or transitions share names (empty names are not a problem)
 	 * @throws DuplicatedIdError If two or more places or transitions share ids
 	 */
-	private Triplet<Place[], Transition[], Arc[]> getPetriComponentsFromNodeList(NodeList netElements) throws BadPnmlFormatException, DuplicatedNameError, DuplicatedIdError{
-		ArrayList<Place> places = new ArrayList<Place>();
-		ArrayList<Transition> transitions = new ArrayList<Transition>();
-		ArrayList<Arc> arcs = new ArrayList<Arc>();
+	private Triplet<MPlace[], MTransition[], MArc[]> getPetriComponentsFromNodeList(NodeList netElements) throws BadPnmlFormatException, DuplicatedNameError, DuplicatedIdError{
+		ArrayList<MPlace> places = new ArrayList<MPlace>();
+		ArrayList<MTransition> transitions = new ArrayList<MTransition>();
+		ArrayList<MArc> arcs = new ArrayList<MArc>();
 		ArrayList<Triplet<String, Node, NodeList>> pendingArcs = new ArrayList<Triplet<String, Node, NodeList>>();
 		for(int index = 0; index < netElements.getLength(); index++){
 			Node child = netElements.item(index);
@@ -158,22 +158,22 @@ public class PnmlParser{
 		}
 		
 		// Just in case, let's order the places and transitions by index. It'll be needed for matrices generation
-		places.sort((Place p1, Place p2) -> p1.getIndex() - p2.getIndex());
-		transitions.sort((Transition t1, Transition t2) -> t1.getIndex() - t2.getIndex());
+		places.sort((MPlace p1, MPlace p2) -> p1.getIndex() - p2.getIndex());
+		transitions.sort((MTransition t1, MTransition t2) -> t1.getIndex() - t2.getIndex());
 		
 		for(Triplet<String, Node, NodeList> arcData : pendingArcs){
 			arcs.add(getArc(arcData.getValue0(), arcData.getValue1(), arcData.getValue2(), places, transitions));
 		}
 		
-		Place[] retPlaces = new Place[places.size()];
-		Transition[] retTransitions = new Transition[transitions.size()];
-		Arc[] retArcs = new Arc[arcs.size()];
+		MPlace[] retPlaces = new MPlace[places.size()];
+		MTransition[] retTransitions = new MTransition[transitions.size()];
+		MArc[] retArcs = new MArc[arcs.size()];
 
 		retPlaces = places.toArray(retPlaces);
 		retTransitions = transitions.toArray(retTransitions);
 		retArcs = arcs.toArray(retArcs);
 		
-		return new Triplet<Place[], Transition[], Arc[]>(retPlaces, retTransitions, retArcs);
+		return new Triplet<MPlace[], MTransition[], MArc[]>(retPlaces, retTransitions, retArcs);
 	}
 	
 	/**
@@ -186,9 +186,9 @@ public class PnmlParser{
 	 * @throws BadPnmlFormatException If initial marking is not numerical
 	 * @throws DuplicatedNameError If the new place has the same name as any created before
 	 * @throws DuplicatedIdError If the new place has the same id as any created before
-	 * @see {@link org.unc.lac.javapetriconcurrencymonitor.petrinets.components.Place}
+	 * @see {@link org.unc.lac.javapetriconcurrencymonitor.petrinets.components.MPlace}
 	 */
-	private Place getPlace(String id, Node placeNode, NodeList nl, final ArrayList<Place> places) throws BadPnmlFormatException, DuplicatedNameError, DuplicatedIdError{
+	private MPlace getPlace(String id, Node placeNode, NodeList nl, final ArrayList<MPlace> places) throws BadPnmlFormatException, DuplicatedNameError, DuplicatedIdError{
 		Integer m_inicial = 0;
 		Integer placeIndex = this.placesIndex++;
 		String placeName = "";
@@ -206,7 +206,7 @@ public class PnmlParser{
 			}
 		}
 		
-		for(Place p : places){
+		for(MPlace p : places){
 			String pName = p.getName();
 			if(!pName.isEmpty() && pName.equalsIgnoreCase(placeName)){
 				throw new DuplicatedNameError("Name " + placeName + " is repeated for places");
@@ -220,7 +220,7 @@ public class PnmlParser{
 			placeName = "p" + placesIndex;
 		}
 		
-		return new Place(id, m_inicial, placeIndex, placeName);
+		return new MPlace(id, m_inicial, placeIndex, placeName);
 	}
 	
 	/**
@@ -233,9 +233,9 @@ public class PnmlParser{
 	 * @throws BadPnmlFormatException
 	 * @throws DuplicatedNameError If the new transition has the same name as any created before
 	 * @throws DuplicatedIdError If the new transition has the same id as any created before 
-	 * @see {@link org.unc.lac.javapetriconcurrencymonitor.petrinets.components.Transition}
+	 * @see {@link org.unc.lac.javapetriconcurrencymonitor.petrinets.components.MTransition}
 	 */
-	private Transition getTransition(String id, Node transitionNode, NodeList nl, ArrayList<Transition> transitions) throws BadPnmlFormatException, DuplicatedNameError, DuplicatedIdError{
+	private MTransition getTransition(String id, Node transitionNode, NodeList nl, ArrayList<MTransition> transitions) throws BadPnmlFormatException, DuplicatedNameError, DuplicatedIdError{
 		
 		TimeSpan timeSpan = null;
 		Label label = null;
@@ -281,7 +281,7 @@ public class PnmlParser{
 			guard = new Pair<String, Boolean>(null, false);
 		}
 		
-		for(Transition t : transitions){
+		for(MTransition t : transitions){
 			String tName = t.getName();
 			if(!tName.isEmpty() && tName.equalsIgnoreCase(transitionName)){
 				throw new DuplicatedNameError("Name " + transitionName + " is repeated for transitions");
@@ -296,7 +296,7 @@ public class PnmlParser{
 			transitionName = "t" + transitionsIndex;
 		}
 		
-		return new Transition(id, label, transitionIndex, timeSpan, guard, transitionName);
+		return new MTransition(id, label, transitionIndex, timeSpan, guard, transitionName);
 	}
 	
 	/**
@@ -315,9 +315,9 @@ public class PnmlParser{
 	 * <li> Source and Transition are both places </li>
 	 * <li> Source and Transition are both transitions </li>
 	 * <li> A non-normal arc goes from transition to place </li>
-	 * @see {@link org.unc.lac.javapetriconcurrencymonitor.petrinets.components.Arc}
+	 * @see {@link org.unc.lac.javapetriconcurrencymonitor.petrinets.components.MArc}
 	 */
-	private Arc getArc(String id, Node arcNode, NodeList nl, ArrayList<Place> places, ArrayList<Transition> transitions) throws BadPnmlFormatException{
+	private MArc getArc(String id, Node arcNode, NodeList nl, ArrayList<MPlace> places, ArrayList<MTransition> transitions) throws BadPnmlFormatException{
 		Element arcElement = (Element)arcNode;
 		String sourceId = arcElement.getAttribute(SOURCE);
 		String targetId = arcElement.getAttribute(TARGET);
@@ -353,12 +353,12 @@ public class PnmlParser{
 		boolean targetIsPlace = false;
 		boolean targetIsTransition = false;
 		
-		source = getFirstFromFilteredList(places, (Place p) -> p.getId().equals(sourceId));
+		source = getFirstFromFilteredList(places, (MPlace p) -> p.getId().equals(sourceId));
 		sourceIsPlace = source != null;
 		
 		if(!sourceIsPlace){
 			
-			source = getFirstFromFilteredList(transitions, (Transition t) -> t.getId().equals(sourceId));
+			source = getFirstFromFilteredList(transitions, (MTransition t) -> t.getId().equals(sourceId));
 			sourceIsTransition = source != null;
 			
 			if(!sourceIsTransition){
@@ -366,12 +366,12 @@ public class PnmlParser{
 			}
 		}
 		
-		target = getFirstFromFilteredList(places, (Place p) -> p.getId().equals(targetId));
+		target = getFirstFromFilteredList(places, (MPlace p) -> p.getId().equals(targetId));
 		targetIsPlace = target != null;
 		
 		if(!targetIsPlace){
 			
-			target = getFirstFromFilteredList(transitions, (Transition t) -> t.getId().equals(targetId));
+			target = getFirstFromFilteredList(transitions, (MTransition t) -> t.getId().equals(targetId));
 			targetIsTransition = target != null;
 			
 			if(!targetIsTransition){
@@ -391,7 +391,7 @@ public class PnmlParser{
 			throw new BadPnmlFormatException("Arc " + id + " of type " + type + " is input to a place");
 		}
 
-		return new Arc(id, source, target, weight, type);
+		return new MArc(id, source, target, weight, type);
 	}
 	
 	/**
@@ -513,7 +513,6 @@ public class PnmlParser{
 				break;
 			}
 		}
-		
 		return new Pair<Label,Pair<String, Boolean>>(new Label(isAutomatic, isInformed), guard);
 	}
 }
