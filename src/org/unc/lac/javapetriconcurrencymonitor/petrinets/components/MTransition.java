@@ -6,7 +6,7 @@ public class MTransition extends PetriNode{
 	
 	private Label label;
 	private TimeSpan interval;
-	
+	double rate;
 	private String guardName;
 	private boolean guardEnablingValue;
 	
@@ -34,6 +34,24 @@ public class MTransition extends PetriNode{
 		this.guardEnablingValue = _guard.getValue1() == null ? false : _guard.getValue1();
 		
 		this.timed = interval != null;
+	}
+
+	/**
+	 * Constructor for stochastic transitions
+	 */
+	public MTransition(String _id, Label _label, int _index, double _rate, Pair<String, Boolean> _guard, String _name) throws IllegalArgumentException{
+		super(_id, _index, _name);
+		this.label = _label;
+		this.rate = _rate;
+		if(_guard == null){
+			_guard = new Pair<String, Boolean>("", false);
+		}
+		this.guardName = _guard.getValue0() == null ? "" : _guard.getValue0();
+		this.guardEnablingValue = _guard.getValue1() == null ? false : _guard.getValue1();
+
+		this.timed = interval != null;
+
+		System.out.println("Transition " + _id + " has rate " + rate);
 	}
 	
 	/**
@@ -87,6 +105,14 @@ public class MTransition extends PetriNode{
 	public TimeSpan getTimeSpan() {
 		return interval;
 	}
+
+	/**
+	 * @return the transition's rate
+	 */
+	public double getRate() {
+		return rate;
+	}
+
 	
 	/**
 	 * @return the name for this transition's guard. Empty string if none

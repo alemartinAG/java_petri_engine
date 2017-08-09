@@ -4,6 +4,7 @@ public class Label {
 	
 	private boolean automatic;
 	private boolean informed;
+	private boolean stochastic = false;
 	
 	public Label(boolean au, boolean inf){
 		automatic = au;
@@ -24,6 +25,16 @@ public class Label {
 		String isAutomatic = automatic ? "A" : "D";
 		
 		return "<" + isAutomatic + "," + isInformed + ">";
+	}
+
+	public void setStochastic(boolean sto)
+	{
+		stochastic = sto;
+	}
+
+	public boolean isStochastic()
+	{
+		return stochastic;
 	}
 
 }

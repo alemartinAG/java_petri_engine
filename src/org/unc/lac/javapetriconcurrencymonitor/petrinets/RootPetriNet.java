@@ -1,12 +1,11 @@
 package org.unc.lac.javapetriconcurrencymonitor.petrinets;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Optional;
+import java.util.*;
 
+import org.unc.lac.javapetriconcurrencymonitor.errors.IllegalTransitionFiringError;
 import org.unc.lac.javapetriconcurrencymonitor.exceptions.NotInitializedPetriNetException;
 import org.unc.lac.javapetriconcurrencymonitor.exceptions.PetriNetException;
+import org.unc.lac.javapetriconcurrencymonitor.monitor.PetriMonitor;
 import org.unc.lac.javapetriconcurrencymonitor.petrinets.components.MArc;
 import org.unc.lac.javapetriconcurrencymonitor.petrinets.components.Label;
 import org.unc.lac.javapetriconcurrencymonitor.petrinets.components.PetriNode;
@@ -33,6 +32,8 @@ public abstract class RootPetriNet {
 	protected boolean[] automaticTransitions;
 	protected boolean[] informedTransitions;
 	protected boolean[] enabledTransitions;
+	protected boolean[] stochasticTransitions;
+	protected boolean[] stochasticTransitionsWaiting;
 	
 	/** Inhibition arcs pre-incidence matrix */
 	protected Boolean[][] inhibitionMatrix;
@@ -110,11 +111,32 @@ public abstract class RootPetriNet {
 	private void computeAutomaticAndInformed() {
 		this.automaticTransitions = new boolean[transitions.length];
 		this.informedTransitions = new boolean[transitions.length];
+		this.stochasticTransitions = new boolean[transitions.length];
+		this.stochasticTransitionsWaiting = new boolean[transitions.length];
+
 		for(int i=0; i<automaticTransitions.length; i++){
 			Label thisTransitionLabel = transitions[i].getLabel();
 			automaticTransitions[i] = thisTransitionLabel.isAutomatic();
 			informedTransitions[i] = thisTransitionLabel.isInformed();
+			stochasticTransitions[i] = thisTransitionLabel.isStochastic();
+			stochasticTransitionsWaiting[i] = false;
 		}
+
+		printArray(automaticTransitions, "automatic");
+		printArray(informedTransitions, "informed");
+		printArray(stochasticTransitions, "stochastic");
+		printArray(stochasticTransitionsWaiting, "waiting");
+	}
+
+	private void printArray(boolean[] array, String name)
+	{
+		System.out.print(name + ": [");
+		for(int i = 0; i < array.length; i++)
+		{
+			int value = array[i] ? 1 : 0;
+			System.out.print(" " + value + " ");
+		}
+		System.out.print("]\n");
 	}
 	
 	private void fillGuardsMap(){
@@ -157,6 +179,7 @@ public abstract class RootPetriNet {
 		// it's equivalent to pick nth column from Incidence matrix (I) 
 		// and add it to the current marking (m_i)
 		// and if there is a reset arc, all tokens from its source place are taken.
+
 		if(transition == null){
 			throw new IllegalArgumentException("Null Transition passed as argument");
 		}
@@ -185,10 +208,41 @@ public abstract class RootPetriNet {
 		}
 		
 		enabledTransitions = computeEnabledTransitions();
-		
+
+		System.out.println("Successfully fired " + transition.getName());
 		return PetriNetFireOutcome.SUCCESS;
 	}
-	
+
+	public synchronized PetriNetFireOutcome fire(final MTransition transition, int time, PetriMonitor monitor)
+	{
+		Thread t = new Thread(new Runnable() {
+			@Override
+			public void run()
+			{
+				try
+				{
+					System.out.println("Transition " + transition.getName() + " began");
+					int millis = time/1000;
+					int nanos = 0;
+					if(millis < 1)
+					{
+						nanos = millis * 1000000;
+						millis = 0;
+
+					}
+					Thread.sleep(millis, nanos);
+					monitor.fireTransition(transition);
+				} catch (IllegalTransitionFiringError | IllegalArgumentException | PetriNetException e) {
+					e.printStackTrace();
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+		});
+		t.start();
+		return PetriNetFireOutcome.SUCCESS;
+	}
+
 	/**
 	 * gets the transitions array and evaluates each one if is enabled or not.
 	 * @return a boolean array that contains if each transition is enabled or not (true or false)
@@ -199,6 +253,16 @@ public abstract class RootPetriNet {
 	
 	public boolean[] getAutomaticTransitions(){
 		return automaticTransitions;
+	}
+
+	public boolean[] getStochasticTransitions()
+	{
+		return stochasticTransitions;
+	}
+
+	public boolean[] getStochasticTransitionsWaiting()
+	{
+		return stochasticTransitionsWaiting;
 	}
 	
 	public boolean[] getInformedTransitions(){
@@ -473,6 +537,31 @@ public abstract class RootPetriNet {
 		} catch (NullPointerException e){
 			return false;
 		}
+	}
+
+	public void setWaitingStochasticTransition(MTransition transition, boolean value)
+	{
+		stochasticTransitionsWaiting[transition.getIndex()] = value;
+	}
+
+	public boolean isStochastic(MTransition transition)
+	{
+		return stochasticTransitions[transition.getIndex()];
+	}
+
+	public boolean isWaiting(MTransition transition)
+	{
+		return stochasticTransitionsWaiting[transition.getIndex()];
+	}
+
+	public boolean anyWaiting()
+	{
+		for(int i = 0; i < stochasticTransitionsWaiting.length; i++)
+		{
+			if(stochasticTransitionsWaiting[i])
+				return true;
+		}
+		return false;
 	}
 	
 	

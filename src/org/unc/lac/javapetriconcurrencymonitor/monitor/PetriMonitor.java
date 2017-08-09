@@ -15,6 +15,7 @@ import org.unc.lac.javapetriconcurrencymonitor.queues.FairQueue;
 import org.unc.lac.javapetriconcurrencymonitor.queues.VarCondQueue;
 import org.unc.lac.javapetriconcurrencymonitor.utils.PriorityBinaryLock;
 import org.unc.lac.javapetriconcurrencymonitor.utils.PriorityBinaryLock.LockPriority;
+import org.unc.lac.javapetriconcurrencymonitor.petrinets.*;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -24,6 +25,8 @@ import rx.Subscription;
 import rx.subjects.PublishSubject;
 
 public class PetriMonitor {
+
+	public static boolean simulationRunning = false;
 
 	/** Petri Net to command the monitor orchestration */
 	private RootPetriNet petri;
@@ -98,7 +101,6 @@ public class PetriMonitor {
 	 * @throws NotInitializedPetriNetException when firing a timed transition before initializing the petri net
 	 * @throws IllegalTransitionFiringError when an request to fire an automatic transition arrives
 	 * @throws PetriNetException If an error regarding petri nets occurs.
-	 * @see RootPetriNet#fire(MTransition, boolean)
 	 */
 	public void fireTransition(final MTransition transitionToFire) throws IllegalTransitionFiringError, NotInitializedPetriNetException, PetriNetException{
 		fireTransition(transitionToFire, false);
@@ -122,15 +124,17 @@ public class PetriMonitor {
 	 * A perennial fire doesn't send a thread to sleep when the firing failed.
 	 * More info in project readme file.
 	 * @param transitionToFire The transition to fire
-	 * @param perenialFire True indicates a perennial fire
+	 * @param perennialFire True indicates a perennial fire
 	 * @throws IllegalTransitionFiringError when an request to fire an automatic transition arrives
 	 * @throws NotInitializedPetriNetException when firing a timed transition before initializing the petri net
 	 * @throws PetriNetException If an error regarding petri nets occurs.
-	 * @see RootPetriNet#fire(MTransition, boolean)
 	 */
-	public void fireTransition(final MTransition transitionToFire, boolean perennialFire) throws IllegalTransitionFiringError, NotInitializedPetriNetException, PetriNetException{
+	public void fireTransition(final MTransition transitionToFire, boolean perennialFire) throws IllegalTransitionFiringError, NotInitializedPetriNetException, PetriNetException
+	{
+		if(!simulationRunning)
+			return;
 		// An attempt to fire an automatic transition is a severe error and the application should stop automatically
-		if(transitionToFire.getLabel().isAutomatic()){
+		if(transitionToFire.getLabel().isAutomatic() && !transitionToFire.getLabel().isStochastic()){
 			throw new IllegalTransitionFiringError("An automatic transition has tried to be fired manually");
 		}
 		if(!petri.isInitialized()){
@@ -293,11 +297,19 @@ public class PetriMonitor {
 		boolean enabledTransitions[] = petri.getEnabledTransitions();
 		boolean queueHasThreadSleeping[] = getQueuesState(); //Is there anyone in the queue?
 		boolean automaticTransitions[] = petri.getAutomaticTransitions();
+		boolean stochasticTransitions[] = petri.getStochasticTransitions();
+		boolean stochasticTransitionsWaiting[] =  petri.getStochasticTransitionsWaiting();
+		boolean stochasticTransitionsNotWaiting[] = new boolean[stochasticTransitionsWaiting.length];
+
+		for(int i = 0; i<stochasticTransitionsWaiting.length; i++)
+		{
+			stochasticTransitionsNotWaiting[i] =  !stochasticTransitionsWaiting[i];
+		}
 		
 		boolean availablesToFire[] = new boolean[enabledTransitions.length];
 		boolean anyAvailable = false;
 		for(int i = 0; i < availablesToFire.length; i++){
-			availablesToFire[i] = enabledTransitions[i] && (queueHasThreadSleeping[i] || automaticTransitions[i]);
+			availablesToFire[i] = enabledTransitions[i] && (queueHasThreadSleeping[i] || automaticTransitions[i] || stochasticTransitions[i]) && stochasticTransitionsNotWaiting[i] ;
 			anyAvailable |= availablesToFire[i];
 		}
 		
@@ -356,16 +368,38 @@ public class PetriMonitor {
 			keepFiring = petri.getEnabledTransitions()[transitionToFire.getIndex()];
 			if(keepFiring){				
 				try{
-					switch(petri.fire(transitionToFire)) {
+					PetriNetFireOutcome result = null;
+					if(petri.isStochastic(transitionToFire))
+					{
+						if(petri.isWaiting(transitionToFire))
+						{
+							petri.setWaitingStochasticTransition(transitionToFire, false);
+							result = petri.fire(transitionToFire);
+						}
+						else
+						{
+							int time = (int) transitionToFire.getRate();
+							petri.setWaitingStochasticTransition(transitionToFire, true);
+							result = petri.fire(transitionToFire, time, this);
+						}
+					}
+					else
+					{
+						result = petri.fire(transitionToFire);
+					}
+					switch(result)
+					{
 					case SUCCESS:
 						//the transition was fired successfully. If it's informed let's send an event
-						System.out.println("now!" + ((new Date()).getTime() - timeElapsed));
-						try{
-							sendEventAfterFiring(transitionToFire);
-						} catch (IllegalArgumentException e){
-							//nothing wrong, the transition is not informed
+						if(!petri.isWaiting(transitionToFire))
+						{
+							try{
+								sendEventAfterFiring(transitionToFire);
+							} catch (IllegalArgumentException e){
+								//nothing wrong, the transition is not informed
+							}
 						}
-						
+
 						boolean automaticTransitions[] = petri.getAutomaticTransitions();
 						int nextTransitionToFireIndex = getNextTransitionAvailableToFire();
 						if(nextTransitionToFireIndex >= 0){
@@ -403,7 +437,6 @@ public class PetriMonitor {
 						break;
 					case TIMED_BEFORE_TIMESPAN:
 						if(anyThreadSleepingforTransition[transitionIndex].compareAndSet(false, true)){
-							System.out.println("not yet!");
 							// The calling thread came before time span, and there is nobody sleeping waiting for this transition,
 							// release the input mutex and sleep here until the time has come.
 							inQueue.unlock();
@@ -446,6 +479,12 @@ public class PetriMonitor {
 				}
 			}
 			// if this is a perennial fire and the transition is not enabled, don't send the thread to sleep
+			else if(petri.isStochastic(transitionToFire) && petri.isWaiting(transitionToFire))
+			{
+				petri.setWaitingStochasticTransition(transitionToFire, false);
+				System.out.println("Transition " + transitionToFire.getName() + " is no longer enabled");
+				return releaseLock;
+			}
 			else if(!perennialFire){
 				// the fire failed, thus the thread releases the input mutex and goes to sleep
 				sleepInTransitionQueue(transitionToFire, sleptByItselfForThisTransition);

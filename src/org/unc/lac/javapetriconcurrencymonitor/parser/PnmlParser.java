@@ -3,6 +3,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.DocumentBuilder;
 
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import org.javatuples.Pair;
 import org.javatuples.Triplet;
 import org.unc.lac.javapetriconcurrencymonitor.errors.DuplicatedIdError;
@@ -239,15 +240,17 @@ public class PnmlParser{
 		
 		TimeSpan timeSpan = null;
 		Label label = null;
+		double rate = 0;
 		Pair<String, Boolean> guard = null;
 		Integer transitionIndex = this.transitionsIndex++;
 		String transitionName = "";
-		
+		boolean stochastic = false;
+
 		for(int i=0; i<nl.getLength(); i++){
 			String currentNodeName = nl.item(i).getNodeName();
 			if(currentNodeName.equals(LABEL)){
 				try{
-					Pair<Label,Pair<String, Boolean>> labelAndGuard = 
+					Pair<Label,Pair<String, Boolean>> labelAndGuard =
 							getLabelAndGuardFromNode(nl.item(i).getTextContent().trim());
 					label = labelAndGuard.getValue0();
 					guard = labelAndGuard.getValue1();
@@ -263,8 +266,16 @@ public class PnmlParser{
 				for(int j=0; j<delay.getLength(); j++){
 					Node currentNode = delay.item(j);
 					if(currentNode.getNodeName().equals(INTERVAL)){
-						//get the time interval
-						timeSpan = getTimeSpanFromNode(currentNode.getTextContent().trim().replace(" ",""), currentNode.getAttributes());
+						try
+						{
+							timeSpan = getTimeSpanFromNode(currentNode.getTextContent().trim().replace(" ",""), currentNode.getAttributes());
+						}
+						catch (NumberFormatException e)
+						{
+							rate = getRate(currentNode.getTextContent().trim().replace(" ",""), currentNode.getAttributes());
+							stochastic = true;
+						}
+						label.setStochastic(true); // added by j
 						break;
 					}
 				}				
@@ -295,8 +306,11 @@ public class PnmlParser{
 			// if no name specified, by default is t#
 			transitionName = "t" + transitionsIndex;
 		}
-		
-		return new MTransition(id, label, transitionIndex, timeSpan, guard, transitionName);
+
+		if(stochastic)
+			return new MTransition(id, label, transitionIndex, rate, guard, transitionName);
+		else
+			return new MTransition(id, label, transitionIndex, timeSpan, guard, transitionName);
 	}
 	
 	/**
@@ -417,11 +431,11 @@ public class PnmlParser{
 	 * @param attributes the PNML attributes from {@link #INTERVAL} node
 	 * @return TimeSpan object for timed Transition time span
 	 */
-	private TimeSpan getTimeSpanFromNode(String interval, NamedNodeMap attributes){
+	private TimeSpan getTimeSpanFromNode(String interval, NamedNodeMap attributes) throws NumberFormatException{
 		
 		long timeB = 0;
 		long timeE = 0;
-		
+
 		int indexOf = interval.indexOf("\n");
 		timeB = Long.parseLong(interval.substring(0, indexOf),10);
 		if(interval.substring(indexOf+1).equals(INFTY)){
@@ -444,16 +458,28 @@ public class PnmlParser{
 		}
 		return new TimeSpan(timeB, timeE);
 	}
-	
+
 	/**
-	 * Get transition label from text label. Labels order:
-	 * <li> Automatic(A) or Fired(F,D) </li>
-	 * <li> Informed(I) or Not Informed(N) </li>
-	 * <li> Guards (variable name between brackets, ~ and ! are NOT operator, whitespaces will be trimmed if any) </li>
-	 * @param labelInfo The label in string format
-	 * @return A Label object containing the info included in labelInfo
-	 * @throws BadPnmlFormatException if the string doesn't respect the label format
+	 * Return transition rate from string
 	 */
+	private double getRate(String interval, NamedNodeMap attributes)
+	{
+		double rate = 0;
+
+		int indexOf = interval.indexOf("\n");
+		rate = Double.parseDouble(interval.substring(0, indexOf));
+		return rate;
+	}
+
+		/**
+         * Get transition label from text label. Labels order:
+         * <li> Automatic(A) or Fired(F,D) </li>
+         * <li> Informed(I) or Not Informed(N) </li>
+         * <li> Guards (variable name between brackets, ~ and ! are NOT operator, whitespaces will be trimmed if any) </li>
+         * @param labelInfo The label in string format
+         * @return A Label object containing the info included in labelInfo
+         * @throws BadPnmlFormatException if the string doesn't respect the label format
+         */
 	private Pair<Label,Pair<String, Boolean>> getLabelAndGuardFromNode(String labelInfo) throws BadPnmlFormatException{
 		
 		if(labelInfo.charAt(0) != '<' || labelInfo.charAt(labelInfo.length() - 1) != '>'){
