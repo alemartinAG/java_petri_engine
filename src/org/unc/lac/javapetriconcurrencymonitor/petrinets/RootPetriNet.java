@@ -213,7 +213,7 @@ public abstract class RootPetriNet {
 		return PetriNetFireOutcome.SUCCESS;
 	}
 
-	public synchronized PetriNetFireOutcome fire(final MTransition transition, int time, PetriMonitor monitor)
+	public synchronized PetriNetFireOutcome fire(final MTransition transition, double time, PetriMonitor monitor)
 	{
 		Thread t = new Thread(new Runnable() {
 			@Override
@@ -222,14 +222,16 @@ public abstract class RootPetriNet {
 				try
 				{
 					System.out.println("Transition " + transition.getName() + " began");
-					int millis = time/1000;
+					double _time = time;
+					int millis = (int) time;
 					int nanos = 0;
-					if(millis < 1)
+					if((_time - millis) != 0)
 					{
-						nanos = millis * 1000000;
-						millis = 0;
-
+						double substraction = (_time - millis) * 1000000;
+						nanos = (int) substraction;
 					}
+					// System.out.println("Time was " + _time + ", now it's " + millis + " ms and " + nanos + " ns.");
+					transition.setNewTime(_time);
 					Thread.sleep(millis, nanos);
 					monitor.fireTransition(transition);
 				} catch (IllegalTransitionFiringError | IllegalArgumentException | PetriNetException e) {

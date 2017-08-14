@@ -240,11 +240,14 @@ public class PnmlParser{
 		
 		TimeSpan timeSpan = null;
 		Label label = null;
-		double rate = 0;
 		Pair<String, Boolean> guard = null;
 		Integer transitionIndex = this.transitionsIndex++;
 		String transitionName = "";
 		boolean stochastic = false;
+
+		double var1 = 0;
+		double var2 = 0;
+		String distribution = "";
 
 		for(int i=0; i<nl.getLength(); i++){
 			String currentNodeName = nl.item(i).getNodeName();
@@ -261,6 +264,10 @@ public class PnmlParser{
 			else if(currentNodeName.equals(NAME)){
 				transitionName = nl.item(i).getTextContent().trim();
 			}
+			else if(currentNodeName.equals("distribution"))
+			{
+				distribution = nl.item(i).getTextContent().trim();
+			}
 			else if(currentNodeName.equals(DELAY)){
 				NodeList delay = nl.item(i).getChildNodes();
 				for(int j=0; j<delay.getLength(); j++){
@@ -272,7 +279,9 @@ public class PnmlParser{
 						}
 						catch (NumberFormatException e)
 						{
-							rate = getRate(currentNode.getTextContent().trim().replace(" ",""), currentNode.getAttributes());
+							//rate = getRate(currentNode.getTextContent().trim().replace(" ",""), currentNode.getAttributes());
+							var1 = getVar1(currentNode.getTextContent().trim().replace(" ",""), currentNode.getAttributes());
+							var2 = getVar2(currentNode.getTextContent().trim().replace(" ",""), currentNode.getAttributes());
 							stochastic = true;
 						}
 						label.setStochastic(true); // added by j
@@ -308,7 +317,7 @@ public class PnmlParser{
 		}
 
 		if(stochastic)
-			return new MTransition(id, label, transitionIndex, rate, guard, transitionName);
+			return new MTransition(id, label, transitionIndex, distribution, var1, var2, guard, transitionName);
 		else
 			return new MTransition(id, label, transitionIndex, timeSpan, guard, transitionName);
 	}
@@ -460,15 +469,27 @@ public class PnmlParser{
 	}
 
 	/**
-	 * Return transition rate from string
+	 * Return transition var1 from string
 	 */
-	private double getRate(String interval, NamedNodeMap attributes)
+	private double getVar1(String interval, NamedNodeMap attributes)
 	{
-		double rate = 0;
+		double var1 = 0;
 
 		int indexOf = interval.indexOf("\n");
-		rate = Double.parseDouble(interval.substring(0, indexOf));
-		return rate;
+		var1 = Double.parseDouble(interval.substring(0, indexOf));
+		return var1;
+	}
+
+	/**
+	 * Return transition var1 from string
+	 */
+	private double getVar2(String interval, NamedNodeMap attributes)
+	{
+		double var2 = 0;
+
+		int indexOf = interval.indexOf("\n");
+		var2 = Double.parseDouble(interval.substring(indexOf+1));
+		return var2;
 	}
 
 		/**

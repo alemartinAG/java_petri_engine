@@ -1,14 +1,20 @@
 package org.unc.lac.javapetriconcurrencymonitor.petrinets.components;
 
 import org.javatuples.Pair;
+import org.apache.commons.math3.distribution.*;
 
 public class MTransition extends PetriNode{
 	
 	private Label label;
 	private TimeSpan interval;
-	double rate;
 	private String guardName;
 	private boolean guardEnablingValue;
+
+	/** Information for stochastic distribution **/
+	double var1;
+	double var2;
+	double time = 0;
+	String distribution = "";
 	
 	/** This is true for a timed transition only **/
 	private boolean timed;
@@ -39,10 +45,12 @@ public class MTransition extends PetriNode{
 	/**
 	 * Constructor for stochastic transitions
 	 */
-	public MTransition(String _id, Label _label, int _index, double _rate, Pair<String, Boolean> _guard, String _name) throws IllegalArgumentException{
+	public MTransition(String _id, Label _label, int _index, String _dist, double _var1, double _var2, Pair<String, Boolean> _guard, String _name) throws IllegalArgumentException{
 		super(_id, _index, _name);
 		this.label = _label;
-		this.rate = _rate;
+		this.var1 = _var1;
+		this.var2 = _var2;
+		this.distribution = _dist;
 		if(_guard == null){
 			_guard = new Pair<String, Boolean>("", false);
 		}
@@ -51,7 +59,7 @@ public class MTransition extends PetriNode{
 
 		this.timed = interval != null;
 
-		System.out.println("Transition " + _id + " has rate " + rate);
+		System.out.println("Transition " + _id + " has distribution " + distribution + " with values " + var1 + " and " + var2);
 	}
 	
 	/**
@@ -68,7 +76,7 @@ public class MTransition extends PetriNode{
 	}
 	
 	/**
-	 * This constructor is intended for timed transitions only. If this transition is not timed use {@link MTransition#Transition(String, Label, int)}
+	 * This constructor is intended for timed transitions only. If this transition is not timed use {@link MTransition(String, Label, int)}
 	 * @param _id The transition id
 	 * @param _label The transition label object
 	 * @param _index The transition index. It must match the petri's column which correspond to this transition 
@@ -110,7 +118,7 @@ public class MTransition extends PetriNode{
 	 * @return the transition's rate
 	 */
 	public double getRate() {
-		return rate;
+		return 0;
 	}
 
 	
@@ -180,4 +188,49 @@ public class MTransition extends PetriNode{
 		
 		return 0;
 	}
+
+	public void setNewTime(double time)
+	{
+		this.time = time;
+	}
+
+	public double getLastTime()
+	{
+		return time;
+	}
+
+	public double getVar1() { return var1; }
+
+	public double getVar2() { return var2; }
+
+	public double generateSample()
+	{
+		switch (distribution) {
+
+			case "Exponential": {
+				ExponentialDistribution transitionDistribution = new ExponentialDistribution(1 / var1);
+				return transitionDistribution.sample();
+			}
+			case "Normal": {
+				NormalDistribution transitionDistribution = new NormalDistribution(var1, var2);
+				return transitionDistribution.sample();
+			}
+			case "Cauchy": {
+				CauchyDistribution transitionDistribution = new CauchyDistribution(var1, var2);
+				return transitionDistribution.sample();
+			}
+			case "Uniform": {
+				UniformRealDistribution transitionDistribution = new UniformRealDistribution(var1, var2);
+				return transitionDistribution.sample();
+			}
+			case "Log-Nomal": {
+				LogNormalDistribution transitionDistribution = new LogNormalDistribution(var1, var2);
+				return transitionDistribution.sample();
+			}
+			default:
+				break;
+		}
+		return 0;
+	}
+
 }

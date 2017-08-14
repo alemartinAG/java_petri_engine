@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.lang.StrictMath.*;
 
 import org.unc.lac.javapetriconcurrencymonitor.errors.IllegalTransitionFiringError;
 import org.unc.lac.javapetriconcurrencymonitor.exceptions.NotInitializedPetriNetException;
@@ -337,10 +338,17 @@ public class PetriMonitor {
 			firedTransitionInfoMap.put(ID, t.getId());
 			firedTransitionInfoMap.put(INDEX, Integer.toString(t.getIndex()));
 			firedTransitionInfoMap.put(NAME, t.getName());
-			informedTransitionsObservable.onNext(
-					jsonMapper.writeValueAsString(firedTransitionInfoMap));
+
+			if(petri.isStochastic(t))
+			firedTransitionInfoMap.put("time", Double.toString(t.getLastTime()));
+
+			informedTransitionsObservable.onNext(jsonMapper.writeValueAsString(firedTransitionInfoMap));
+
 		} catch (JsonProcessingException e) {
 			// If there was an error processing the JSON let's send the minimal needed info hardcoded here
+			if(petri.isStochastic(t))
+				informedTransitionsObservable.onNext("{\"" + ID + "\":\"" + t.getId() + "," + "time:" + t.getLastTime() + "\"}" + ",");
+			else
 			informedTransitionsObservable.onNext("{\"" + ID + "\":\"" + t.getId() + "\"}");
 		}
 	}
@@ -378,7 +386,7 @@ public class PetriMonitor {
 						}
 						else
 						{
-							int time = (int) transitionToFire.getRate();
+							double time = Math.abs(transitionToFire.generateSample());
 							petri.setWaitingStochasticTransition(transitionToFire, true);
 							result = petri.fire(transitionToFire, time, this);
 						}
