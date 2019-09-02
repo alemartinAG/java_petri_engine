@@ -29,7 +29,7 @@ public class MArc {
 		
 		private static final String INHIBITOR_STR = "inhibitor";
 		private static final String RESET_STR = "reset";
-		private static final String READER_STR = "test";
+		private static final String READER_STR = "read";
 		
 		/**
 		 * Given a pre-defined string present in PNML files, matches and returns

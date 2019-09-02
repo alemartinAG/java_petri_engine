@@ -20,7 +20,7 @@ public class main
 	
 	public static void setUp() 
 	{
-		  PetriNetFactory factory = new PetriNetFactory("C:/Users/Envy/net.pnml");
+		  PetriNetFactory factory = new PetriNetFactory("/home/jna/Desktop/tmp.pnml");
 		  RootPetriNet petri =  (RootPetriNet) factory.makePetriNet(petriNetType.PLACE_TRANSITION);
 		  TransitionsPolicy policy = new FirstInLinePolicy();
 		  PetriMonitor monitor = new PetriMonitor(petri, policy);
