@@ -429,7 +429,7 @@ public abstract class RootPetriNet {
 				}
 			}
 		}
-		if(hasResetArcs){
+		/*if(hasResetArcs){
 			for(int i = 0; i < places.length; i++){
 				boolean emptyPlace = places[i].getMarking() == 0;
 				//resetMatrix should be a binary matrix, so it never should have an element with value grater than 1
@@ -438,7 +438,7 @@ public abstract class RootPetriNet {
 					return false;
 				}
 			}
-		}
+		}*/
 		if(hasReaderArcs){
 			for(int i=0; i<places.length ; i++){
 				if (readerMatrix[i][transitionIndex] > currentMarking[i]){

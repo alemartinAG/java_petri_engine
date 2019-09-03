@@ -161,11 +161,10 @@ import org.unc.lac.javapetriconcurrencymonitor.petrinets.components.MArc.ArcType
 				}
 			}
 			
-			
+			//TODO:
 			// Now let's check if any transition that has a reset arc as input also has any other input arc
 			// That is an illegal condition
-			
-			MArc[] resetArcs = Arrays.stream(arcs)
+			/*MArc[] resetArcs = Arrays.stream(arcs)
 					.filter((MArc a) -> a.getType() == ArcType.RESET)
 					.toArray((int size) -> new MArc[size]);
 			for(MArc resetArc : resetArcs){
@@ -180,7 +179,7 @@ import org.unc.lac.javapetriconcurrencymonitor.petrinets.components.MArc.ArcType
 								"Cannot have another input arcs in transition " + resetArc.getTarget().getName() + ", id: " + transitionIndex + ", because there is a reset arc.");
 					}
 				}
-			}
+			}*/
 			
 			return new Sextet<Integer[][], Integer[][], Integer[][], Boolean[][], Boolean[][], Integer[][]>(pre, pos, inc, inhibition, resetMatrix, readerMatrix);
 		}
