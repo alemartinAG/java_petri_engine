@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.lang.StrictMath.*;
 
 import org.unc.lac.javapetriconcurrencymonitor.errors.IllegalTransitionFiringError;
 import org.unc.lac.javapetriconcurrencymonitor.exceptions.NotInitializedPetriNetException;
@@ -53,12 +52,17 @@ public class PetriMonitor {
 	private final static String INDEX = "index";
 	private final static String NAME = "name";
 
+	private int numberOfTransitions;
+	private long startTime;
+	private long endTime;
+
 	public PetriMonitor(final RootPetriNet _petri, TransitionsPolicy _policy) {
 		if(_petri == null || _policy == null){
 			throw new IllegalArgumentException(this.getClass().getName() + " constructor. Invalid arguments");
 		}
 		petri = _petri;
 		transitionsPolicy = _policy;
+		numberOfTransitions = -1;
 		
 		int transitionsAmount = petri.getTransitions().length;
 		condVarQueue = new FairQueue[transitionsAmount];
@@ -80,6 +84,13 @@ public class PetriMonitor {
 		for(int i = 0; i < transitionsAmount; i++){
 			anyThreadSleepingforTransition[i] = new AtomicBoolean(false);
 		}
+	}
+
+	public PetriMonitor(final RootPetriNet _petri, TransitionsPolicy _policy, int numberOfTransitions){
+		this(_petri,_policy);
+		this.numberOfTransitions = numberOfTransitions;
+		startTime = 0;
+		endTime = 0;
 	}
 
 	/**
@@ -134,6 +145,9 @@ public class PetriMonitor {
 	{
 		if(!simulationRunning)
 			return;
+		if(startTime == 0){
+			startTime = System.currentTimeMillis();
+		}
 		// An attempt to fire an automatic transition is a severe error and the application should stop automatically
 		if(transitionToFire.getLabel().isAutomatic() && !transitionToFire.getLabel().isStochastic()){
 			throw new IllegalTransitionFiringError("An automatic transition has tried to be fired manually");
@@ -399,6 +413,15 @@ public class PetriMonitor {
 					{
 					case SUCCESS:
 						//the transition was fired successfully. If it's informed let's send an event
+						if(numberOfTransitions != -1){
+							numberOfTransitions--;
+							if(numberOfTransitions == 0){
+								simulationRunning = false;
+								endTime = System.currentTimeMillis();
+								System.out.println(endTime-startTime);
+							}
+						}
+
 						if(!petri.isWaiting(transitionToFire))
 						{
 							try{
@@ -418,7 +441,8 @@ public class PetriMonitor {
 								// The transition chosen isn't automatic
 								// so wake up the associated thread to that transition
 								// and leave the monitor without releasing the input mutex
-								condVarQueue[nextTransitionToFireIndex].wakeUp();
+								if(simulationRunning)
+									condVarQueue[nextTransitionToFireIndex].wakeUp();
 								releaseLock = false;
 								keepFiring = false;
 							}
