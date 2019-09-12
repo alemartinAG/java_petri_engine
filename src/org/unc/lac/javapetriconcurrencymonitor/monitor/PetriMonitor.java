@@ -578,4 +578,18 @@ public class PetriMonitor {
 	public boolean isAnyThreadSleepingForTransition(int transitionIndex){
 		return anyThreadSleepingforTransition[transitionIndex].get();
 	}
+
+	public long getSimulationTime(){
+		if (startTime <= 0 | endTime <=0){
+			return -1;
+		}
+		return  endTime-startTime;
+	}
+
+	public long getTimeElapsed(){
+		if (startTime <=0){
+			return -1;
+		}
+		return System.currentTimeMillis()-startTime;
+	}
 }
