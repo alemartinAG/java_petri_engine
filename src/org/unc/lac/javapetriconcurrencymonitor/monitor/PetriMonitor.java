@@ -52,7 +52,7 @@ public class PetriMonitor {
 	private final static String INDEX = "index";
 	private final static String NAME = "name";
 
-	private int numberOfTransitions;
+	private Integer transitionsLeft = null;
 	private long startTime;
 	private long endTime;
 
@@ -62,7 +62,6 @@ public class PetriMonitor {
 		}
 		petri = _petri;
 		transitionsPolicy = _policy;
-		numberOfTransitions = -1;
 		
 		int transitionsAmount = petri.getTransitions().length;
 		condVarQueue = new FairQueue[transitionsAmount];
@@ -86,9 +85,9 @@ public class PetriMonitor {
 		}
 	}
 
-	public PetriMonitor(final RootPetriNet _petri, TransitionsPolicy _policy, int numberOfTransitions){
+	public PetriMonitor(final RootPetriNet _petri, TransitionsPolicy _policy, int _transitions){
 		this(_petri,_policy);
-		this.numberOfTransitions = numberOfTransitions;
+		transitionsLeft = _transitions;
 		startTime = 0;
 		endTime = 0;
 	}
@@ -143,8 +142,10 @@ public class PetriMonitor {
 	 */
 	public void fireTransition(final MTransition transitionToFire, boolean perennialFire) throws IllegalTransitionFiringError, NotInitializedPetriNetException, PetriNetException
 	{
-		if(!simulationRunning)
+		if(!simulationRunning){
+			System.out.printf("Thread-%s is still alive...\n", Thread.currentThread().getName());
 			return;
+		}
 		if(startTime == 0){
 			startTime = System.currentTimeMillis();
 		}
@@ -413,9 +414,9 @@ public class PetriMonitor {
 					{
 					case SUCCESS:
 						//the transition was fired successfully. If it's informed let's send an event
-						if(numberOfTransitions != -1){
-							numberOfTransitions--;
-							if(numberOfTransitions == 0){
+						if(transitionsLeft != null){
+							transitionsLeft--;
+							if(transitionsLeft == 0){
 								simulationRunning = false;
 								endTime = System.currentTimeMillis();
 								System.out.println(endTime-startTime);
