@@ -208,7 +208,7 @@ public abstract class RootPetriNet {
 		}
 		
 		enabledTransitions = computeEnabledTransitions();
-		System.out.println("Successfully fired " + transition.getName());
+		//System.out.println("Successfully fired " + transition.getName());
 		return PetriNetFireOutcome.SUCCESS;
 	}
 
