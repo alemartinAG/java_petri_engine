@@ -1,7 +1,6 @@
 package org.unc.lac.javapetriconcurrencymonitor.petrinets;
 
 import java.util.*;
-import java.util.stream.IntStream;
 
 import org.unc.lac.javapetriconcurrencymonitor.errors.IllegalTransitionFiringError;
 import org.unc.lac.javapetriconcurrencymonitor.exceptions.NotInitializedPetriNetException;
@@ -47,8 +46,8 @@ public abstract class RootPetriNet {
 	protected boolean hasResetArcs;
 	protected boolean hasReaderArcs;
 
-	private boolean[] inhibitionColumnszero;
-	private boolean[] readerColumnszero;
+	private boolean[] inhibitionColumnNotEmpty;
+	private boolean[] readerColumnNotEmpty;
 	
 	
 	protected boolean initializedPetriNet;
@@ -95,8 +94,8 @@ public abstract class RootPetriNet {
 		hasResetArcs = isMatrixNonZero(resetMatrix);
 		hasReaderArcs = isMatrixNonZero(readerMatrix);
 
-		inhibitionColumnszero = checkMatrixColumns(inhibitionMatrix);
-		readerColumnszero = checkMatrixColumns(readerMatrix);
+		inhibitionColumnNotEmpty = checkMatrixColumns(inhibitionMatrix);
+		readerColumnNotEmpty = checkMatrixColumns(readerMatrix);
 	}
 	
 	/**
@@ -428,7 +427,7 @@ public abstract class RootPetriNet {
 			}
 		}
 		if(hasInhibitionArcs){
-			if(inhibitionColumnszero[transitionIndex]) {
+			if(inhibitionColumnNotEmpty[transitionIndex]) {
 				for (int i = 0; i < places.length; i++) {
 					boolean emptyPlace = currentMarking[i] == 0;
 					boolean placeInhibitsTransition = inhibitionMatrix[i][transitionIndex];
@@ -449,7 +448,7 @@ public abstract class RootPetriNet {
 			}
 		}*/
 		if(hasReaderArcs){
-			if(readerColumnszero[transitionIndex]) {
+			if(readerColumnNotEmpty[transitionIndex]) {
 				for (int i = 0; i < places.length; i++) {
 					if (readerMatrix[i][transitionIndex] > currentMarking[i]) {
 						return false;
