@@ -143,7 +143,6 @@ public class PetriMonitor {
 	public void fireTransition(final MTransition transitionToFire, boolean perennialFire) throws IllegalTransitionFiringError, NotInitializedPetriNetException, PetriNetException
 	{
 		if(!simulationRunning){
-			System.out.printf("Thread-%s is still alive...\n", Thread.currentThread().getName());
 			return;
 		}
 		if(startTime == 0){
@@ -419,7 +418,6 @@ public class PetriMonitor {
 							if(transitionsLeft == 0){
 								simulationRunning = false;
 								endTime = System.currentTimeMillis();
-								System.out.println(endTime-startTime);
 							}
 						}
 
