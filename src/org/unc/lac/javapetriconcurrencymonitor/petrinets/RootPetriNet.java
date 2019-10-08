@@ -1,6 +1,7 @@
 package org.unc.lac.javapetriconcurrencymonitor.petrinets;
 
 import java.util.*;
+import java.util.stream.IntStream;
 
 import org.unc.lac.javapetriconcurrencymonitor.errors.IllegalTransitionFiringError;
 import org.unc.lac.javapetriconcurrencymonitor.exceptions.NotInitializedPetriNetException;
@@ -45,6 +46,9 @@ public abstract class RootPetriNet {
 	protected boolean hasInhibitionArcs;
 	protected boolean hasResetArcs;
 	protected boolean hasReaderArcs;
+
+	private boolean[] inhibitionColumnszero;
+	private boolean[] readerColumnszero;
 	
 	
 	protected boolean initializedPetriNet;
@@ -90,6 +94,9 @@ public abstract class RootPetriNet {
 		hasInhibitionArcs = isMatrixNonZero(inhibitionMatrix);
 		hasResetArcs = isMatrixNonZero(resetMatrix);
 		hasReaderArcs = isMatrixNonZero(readerMatrix);
+
+		inhibitionColumnszero = checkMatrixColumns(inhibitionMatrix);
+		readerColumnszero = checkMatrixColumns(readerMatrix);
 	}
 	
 	/**
@@ -208,7 +215,7 @@ public abstract class RootPetriNet {
 		}
 		
 		enabledTransitions = computeEnabledTransitions();
-		System.out.println("Successfully fired " + transition.getName());
+		//System.out.println("Successfully fired " + transition.getName());
 		return PetriNetFireOutcome.SUCCESS;
 	}
 
@@ -421,11 +428,13 @@ public abstract class RootPetriNet {
 			}
 		}
 		if(hasInhibitionArcs){
-			for(int i = 0; i < places.length; i++){
-				boolean emptyPlace = places[i].getMarking() == 0;
-				boolean placeInhibitsTransition = inhibitionMatrix[i][transitionIndex];
-				if(!emptyPlace && placeInhibitsTransition){
-					return false;
+			if(inhibitionColumnszero[transitionIndex]) {
+				for (int i = 0; i < places.length; i++) {
+					boolean emptyPlace = currentMarking[i] == 0;
+					boolean placeInhibitsTransition = inhibitionMatrix[i][transitionIndex];
+					if (!emptyPlace && placeInhibitsTransition) {
+						return false;
+					}
 				}
 			}
 		}
@@ -440,9 +449,11 @@ public abstract class RootPetriNet {
 			}
 		}*/
 		if(hasReaderArcs){
-			for(int i=0; i<places.length ; i++){
-				if (readerMatrix[i][transitionIndex] > currentMarking[i]){
-					return false;
+			if(readerColumnszero[transitionIndex]) {
+				for (int i = 0; i < places.length; i++) {
+					if (readerMatrix[i][transitionIndex] > currentMarking[i]) {
+						return false;
+					}
 				}
 			}
 		}
@@ -538,6 +549,39 @@ public abstract class RootPetriNet {
 		} catch (NullPointerException e){
 			return false;
 		}
+	}
+
+	private boolean [] checkMatrixColumns(Integer[][] matrix){
+
+		boolean [] result = new boolean[matrix[0].length];
+		Arrays.fill(result,false);
+
+		for(int i = 0; i<matrix[0].length;i++){
+			for(int j = 0; j<matrix.length; j++){
+				if (matrix[j][i] != 0) {
+					result[i] = true;
+					break;
+				}
+			}
+		}
+		return result;
+	}
+
+	private boolean [] checkMatrixColumns(Boolean[][] matrix){
+
+		boolean [] result = new boolean[matrix[0].length];
+		Arrays.fill(result,false);
+
+		for(int i = 0; i<matrix[0].length;i++){
+			for(int j = 0; j<matrix.length; j++){
+				if (matrix[j][i]) {
+					result[i] = true;
+					break;
+				}
+			}
+		}
+		return result;
+
 	}
 
 	public void setWaitingStochasticTransition(MTransition transition, boolean value)
