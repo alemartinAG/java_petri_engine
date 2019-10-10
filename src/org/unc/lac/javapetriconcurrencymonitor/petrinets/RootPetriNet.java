@@ -100,6 +100,14 @@ public abstract class RootPetriNet {
 		hasResetArcs = MatrixUtils.isMatrixNonZero(resetMatrix);
 		hasReaderArcs = MatrixUtils.isMatrixNonZero(readerMatrix);
 
+		if(hasInhibitionArcs){
+			inhibitionMatrix_T = (Boolean[][]) MatrixUtils.transpose(inhibitionMatrix);
+		}
+
+		if(hasReaderArcs){
+			readerMatrix_T = (Integer[][]) MatrixUtils.transpose(readerMatrix);
+		}
+
 		inhibitionColumnszero = MatrixUtils.columnsNotZero(inhibitionMatrix);
 		readerColumnszero = MatrixUtils.columnsNotZero(readerMatrix);
 	}
