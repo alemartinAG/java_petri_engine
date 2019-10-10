@@ -101,11 +101,11 @@ public abstract class RootPetriNet {
 		hasReaderArcs = MatrixUtils.isMatrixNonZero(readerMatrix);
 
 		if(hasInhibitionArcs){
-			inhibitionMatrix_T = (Boolean[][]) MatrixUtils.transpose(inhibitionMatrix);
+			inhibitionMatrix_T = MatrixUtils.transpose(inhibitionMatrix);
 		}
 
 		if(hasReaderArcs){
-			readerMatrix_T = (Integer[][]) MatrixUtils.transpose(readerMatrix);
+			readerMatrix_T = MatrixUtils.transpose(readerMatrix);
 		}
 
 		inhibitionColumnszero = MatrixUtils.columnsNotZero(inhibitionMatrix);

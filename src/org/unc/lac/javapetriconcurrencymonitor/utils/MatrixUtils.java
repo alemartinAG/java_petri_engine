@@ -5,12 +5,37 @@ import java.util.HashSet;
 
 public class MatrixUtils {
 
-    public static Object[][] transpose(Object[][] matrix){
+    public static Integer[][] transpose(Integer[][] matrix){
 
         int rows = matrix[0].length;
         int columns = matrix.length;
 
-        Object[][] matrix_T = new Object[rows][columns];
+        Integer[][] matrix_T = new Integer[rows][columns];
+
+        for(int i=0; i<columns; i++){
+            for(int j=0; j<rows; j++){
+                matrix_T[j][i] = matrix[i][j];
+            }
+        }
+
+        System.out.print("T = " + Arrays.toString(matrix_T[0]));
+
+        System.out.print("\nN = ");
+        for(int i=0; i<rows; i++){
+            System.out.printf("%3d ",matrix[0][i]);
+        }
+        System.out.print("\n");
+
+
+        return matrix_T;
+    }
+
+    public static Boolean[][] transpose(Boolean[][] matrix){
+
+        int rows = matrix[0].length;
+        int columns = matrix.length;
+
+        Boolean[][] matrix_T = new Boolean[rows][columns];
 
         for(int i=0; i<columns; i++){
             for(int j=0; j<rows; j++){
@@ -19,7 +44,6 @@ public class MatrixUtils {
         }
 
         return matrix_T;
-
     }
 
     public static boolean[] columnsNotZero(Integer[][] matrix){
