@@ -11,6 +11,7 @@ import org.unc.lac.javapetriconcurrencymonitor.petrinets.components.Label;
 import org.unc.lac.javapetriconcurrencymonitor.petrinets.components.PetriNode;
 import org.unc.lac.javapetriconcurrencymonitor.petrinets.components.MPlace;
 import org.unc.lac.javapetriconcurrencymonitor.petrinets.components.MTransition;
+import org.unc.lac.javapetriconcurrencymonitor.utils.MatrixUtils;
 
 /**
  * Implementation for petri net model.
@@ -27,6 +28,7 @@ public abstract class RootPetriNet {
 	protected Integer[][] post;
 	/** Incidece matrix */
 	protected Integer[][] inc;
+	protected Integer[][] inc_T;
 	protected Integer[] currentMarking;
 	protected Integer[] initialMarking;
 	protected boolean[] automaticTransitions;
@@ -37,10 +39,12 @@ public abstract class RootPetriNet {
 	
 	/** Inhibition arcs pre-incidence matrix */
 	protected Boolean[][] inhibitionMatrix;
+	protected Boolean[][] inhibitionMatrix_T;
 	/** Reset arcs pre-incidence matrix */
 	protected Boolean[][] resetMatrix;
 	/** Reader arcs pre-incidence matrix */
 	protected Integer[][] readerMatrix;
+	protected Integer[][] readerMatrix_T;
 	
 	protected boolean hasInhibitionArcs;
 	protected boolean hasResetArcs;
@@ -90,12 +94,24 @@ public abstract class RootPetriNet {
 		this.inhibitionMatrix = _inhibitionMatrix;
 		this.resetMatrix = _resetMatrix;
 		this.readerMatrix = _readerMatrix;
-		hasInhibitionArcs = isMatrixNonZero(inhibitionMatrix);
-		hasResetArcs = isMatrixNonZero(resetMatrix);
-		hasReaderArcs = isMatrixNonZero(readerMatrix);
 
-		inhibitionColumnNotEmpty = checkMatrixColumns(inhibitionMatrix);
-		readerColumnNotEmpty = checkMatrixColumns(readerMatrix);
+
+		hasInhibitionArcs = MatrixUtils.isMatrixNonZero(inhibitionMatrix);
+		hasResetArcs = MatrixUtils.isMatrixNonZero(resetMatrix);
+		hasReaderArcs = MatrixUtils.isMatrixNonZero(readerMatrix);
+
+		inc_T = MatrixUtils.transpose(inc);
+
+		if(hasInhibitionArcs){
+			inhibitionMatrix_T = MatrixUtils.transpose(inhibitionMatrix);
+		}
+
+		if(hasReaderArcs){
+			readerMatrix_T = MatrixUtils.transpose(readerMatrix);
+		}
+
+		inhibitionColumnszero = MatrixUtils.columnsNotZero(inhibitionMatrix);
+		readerColumnszero = MatrixUtils.columnsNotZero(readerMatrix);
 	}
 	
 	/**
@@ -127,24 +143,8 @@ public abstract class RootPetriNet {
 			stochasticTransitions[i] = thisTransitionLabel.isStochastic();
 			stochasticTransitionsWaiting[i] = false;
 		}
-
-		printArray(automaticTransitions, "automatic");
-		printArray(informedTransitions, "informed");
-		printArray(stochasticTransitions, "stochastic");
-		printArray(stochasticTransitionsWaiting, "waiting");
 	}
 
-	private void printArray(boolean[] array, String name)
-	{
-		System.out.print(name + ": [");
-		for(int i = 0; i < array.length; i++)
-		{
-			int value = array[i] ? 1 : 0;
-			System.out.print(" " + value + " ");
-		}
-		System.out.print("]\n");
-	}
-	
 	private void fillGuardsMap(){
 		if(guards == null){
 			guards = new HashMap<String, Boolean>();
@@ -199,7 +199,7 @@ public abstract class RootPetriNet {
 			throw new IllegalArgumentException("Index " + transitionIndex + " doesn't match any transition's index in this petri net");
 		}
 		
-		if(!isEnabled(transition)){
+		if(!isEnabled(transition)){ //TODO check!!! no need to calculate again
 			return PetriNetFireOutcome.NOT_ENABLED;
 		}
 		
@@ -212,7 +212,7 @@ public abstract class RootPetriNet {
 			}
 			places[i].setMarking(currentMarking[i]);
 		}
-		
+		System.out.println("Disparo:" + transitionIndex);
 		enabledTransitions = computeEnabledTransitions();
 		//System.out.println("Successfully fired " + transition.getName());
 		return PetriNetFireOutcome.SUCCESS;
@@ -459,6 +459,75 @@ public abstract class RootPetriNet {
 		return true;
 		
 	}
+
+	boolean[] areEnabled(){
+
+		boolean[] E = new boolean[transitions.length];
+		Arrays.fill(E,true);
+		boolean[] B = new boolean[transitions.length];
+		Arrays.fill(B,true);
+		boolean[] L = new boolean[transitions.length];
+		Arrays.fill(L,true);
+		//Calculo vector E con transiciones habilitadas por marca
+		//calcE()
+
+
+		int length, height;
+		length = inc_T.length;
+		height = inc_T[0].length;
+		for(int i = 0; i < length; i++) {
+			for (int j = 0; j < height; j++) {
+				if ((currentMarking[j] + inc_T[i][j]) < 0) {
+					E[i] = false;
+					break;
+				}
+			}
+		}
+		System.out.println(Arrays.toString(E));
+
+		//Calculo vector B con transiciones des sensibilizadas por arco inhibidor B
+		if(hasInhibitionArcs) {
+			length = inhibitionMatrix_T.length;
+			height = inhibitionMatrix_T[0].length;
+			System.out.println("holis");
+
+			for (int i = 0; i < length; i++) {
+				for (int j = 0; j < height; j++) {
+					if (inhibitionMatrix_T[i][j] && currentMarking[j] != 0) {
+						B[i] = false;
+						break;
+					}
+				}
+			}
+		}
+
+		System.out.println(Arrays.toString(B));
+		//Calculo vector L con transiciones des sensibilizadas por arco lector L
+
+		if(hasReaderArcs) {
+			length = readerMatrix_T.length;
+			height = readerMatrix_T[0].length;
+
+			for (int i = 0; i < length; i++) {
+				for (int j = 0; j < height; j++) {
+					if (readerMatrix_T[i][j] > currentMarking[j]) {
+						L[i] = false;
+						break;
+					}
+				}
+			}
+		}
+
+		System.out.println(Arrays.toString(L));
+		boolean[] enabled = new boolean[transitions.length];
+		for(int i = 0; i < transitions.length; i++){
+			enabled[i] = E[i] & B[i] & L[i];
+		}
+
+		System.out.println(Arrays.toString(enabled));
+		//Calculo vector final Ex = E and B and L
+		return enabled;
+	}
 	
 	/**
 	 * Adds a new guard to the petriNet or updates a guard's value.
@@ -494,93 +563,6 @@ public abstract class RootPetriNet {
 	 */
 	public int getGuardsAmount() {
 		return guards.size();
-	}
-	
-	/**
-	 * Checks if all elements in the matrix are false.
-	 * This is used to know if the petri has the type of arcs described by the matrix semantics.
-	 * @param matrix specifies the kind of arcs
-	 * @return True if the matrix doesn't have all entries as false.
-	 */
-	protected boolean isMatrixNonZero(Boolean[][] matrix){
-		// if the matrix is null or if all elements are zeros
-		// the net does not have the type of arcs described by the matrix semantics
-		try{
-			// this trivial comparison is to throw a NullPointerException if matrix is null
-			matrix.equals(matrix);
-			boolean allFalse = true;
-			for( Boolean[] row : matrix ){
-				// if hashset size is 1 all elements are equal
-				allFalse &= !row[0] &&
-						new HashSet<Boolean>(Arrays.asList(row)).size() == 1;
-				if(!allFalse){
-					return true;
-				}
-			}
-			return !allFalse;
-		} catch (NullPointerException e){
-			return false;
-		}
-	}
-	
-	/**
-	 * Checks if all elements in the matrix are zero.
-	 * This is used to know if the petri has the type of arcs described by the matrix semantics.
-	 * @param matrix specifies the kind of arcs
-	 * @return True if the matrix is not all zeros.
-	 */
-	protected boolean isMatrixNonZero(Integer[][] matrix){
-		// if the matrix is null or if all elements are zeros
-		// the net does not have the type of arcs described by the matrix semantics
-		try{
-			// this trivial comparison is to throw a NullPointerException if matrix is null
-			matrix.equals(matrix);
-			boolean allZeros = true;
-			for( Integer[] row : matrix ){
-				// if hashset size is 1 all elements are equal
-				allZeros &= row[0] == 0 &&
-						new HashSet<Integer>(Arrays.asList(row)).size() == 1;
-				if(!allZeros){
-					return true;
-				}
-			}
-			return !allZeros;
-		} catch (NullPointerException e){
-			return false;
-		}
-	}
-
-	private boolean [] checkMatrixColumns(Integer[][] matrix){
-
-		boolean [] result = new boolean[matrix[0].length];
-		Arrays.fill(result,false);
-
-		for(int i = 0; i<matrix[0].length;i++){
-			for(int j = 0; j<matrix.length; j++){
-				if (matrix[j][i] != 0) {
-					result[i] = true;
-					break;
-				}
-			}
-		}
-		return result;
-	}
-
-	private boolean [] checkMatrixColumns(Boolean[][] matrix){
-
-		boolean [] result = new boolean[matrix[0].length];
-		Arrays.fill(result,false);
-
-		for(int i = 0; i<matrix[0].length;i++){
-			for(int j = 0; j<matrix.length; j++){
-				if (matrix[j][i]) {
-					result[i] = true;
-					break;
-				}
-			}
-		}
-		return result;
-
 	}
 
 	public void setWaitingStochasticTransition(MTransition transition, boolean value)
