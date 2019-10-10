@@ -100,6 +100,8 @@ public abstract class RootPetriNet {
 		hasResetArcs = MatrixUtils.isMatrixNonZero(resetMatrix);
 		hasReaderArcs = MatrixUtils.isMatrixNonZero(readerMatrix);
 
+		inc_T = MatrixUtils.transpose(inc);
+
 		if(hasInhibitionArcs){
 			inhibitionMatrix_T = MatrixUtils.transpose(inhibitionMatrix);
 		}
@@ -210,7 +212,7 @@ public abstract class RootPetriNet {
 			}
 			places[i].setMarking(currentMarking[i]);
 		}
-		
+		System.out.println("Disparo:" + transitionIndex);
 		enabledTransitions = computeEnabledTransitions();
 		//System.out.println("Successfully fired " + transition.getName());
 		return PetriNetFireOutcome.SUCCESS;
@@ -469,21 +471,28 @@ public abstract class RootPetriNet {
 		//Calculo vector E con transiciones habilitadas por marca
 		//calcE()
 
-		int i,j;
-		for(i = 0; i < inc_T.length; i++) {
-			for (j = 0; j < inc_T[i].length; j++) {
+
+		int length, height;
+		length = inc_T.length;
+		height = inc_T[0].length;
+		for(int i = 0; i < length; i++) {
+			for (int j = 0; j < height; j++) {
 				if ((currentMarking[j] + inc_T[i][j]) < 0) {
 					E[i] = false;
 					break;
 				}
 			}
 		}
-		//System.out.println(Arrays.toString(E));
+		System.out.println(Arrays.toString(E));
 
 		//Calculo vector B con transiciones des sensibilizadas por arco inhibidor B
 		if(hasInhibitionArcs) {
-			for (i = 0; i < inhibitionMatrix_T.length; i++) {
-				for (j = 0; j < inhibitionMatrix_T[0].length; j++) {
+			length = inhibitionMatrix_T.length;
+			height = inhibitionMatrix_T[0].length;
+			System.out.println("holis");
+
+			for (int i = 0; i < length; i++) {
+				for (int j = 0; j < height; j++) {
 					if (inhibitionMatrix_T[i][j] && currentMarking[j] != 0) {
 						B[i] = false;
 						break;
@@ -491,11 +500,16 @@ public abstract class RootPetriNet {
 				}
 			}
 		}
+
+		System.out.println(Arrays.toString(B));
 		//Calculo vector L con transiciones des sensibilizadas por arco lector L
 
 		if(hasReaderArcs) {
-			for (i = 0; i < readerMatrix_T.length; i++) {
-				for (j = 0; j < readerMatrix_T[0].length; j++) {
+			length = readerMatrix_T.length;
+			height = readerMatrix_T[0].length;
+
+			for (int i = 0; i < length; i++) {
+				for (int j = 0; j < height; j++) {
 					if (readerMatrix_T[i][j] > currentMarking[j]) {
 						L[i] = false;
 						break;
@@ -503,11 +517,14 @@ public abstract class RootPetriNet {
 				}
 			}
 		}
+
+		System.out.println(Arrays.toString(L));
 		boolean[] enabled = new boolean[transitions.length];
-		for(i = 0; i < transitions.length; i++){
+		for(int i = 0; i < transitions.length; i++){
 			enabled[i] = E[i] & B[i] & L[i];
 		}
 
+		System.out.println(Arrays.toString(enabled));
 		//Calculo vector final Ex = E and B and L
 		return enabled;
 	}

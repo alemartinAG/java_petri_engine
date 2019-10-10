@@ -94,11 +94,11 @@ public class MatrixUtils {
 
             for(int i=0; i<rows; i++){
                 if(!Arrays.equals(matrix[i], zero)){
-                    return false;
+                    return true;
                 }
             }
 
-            return true;
+            return false;
 
         } catch (NullPointerException e){
             return false;
@@ -121,11 +121,11 @@ public class MatrixUtils {
 
             for(int i=0; i<rows; i++){
                 if(!Arrays.equals(matrix[i], zero)){
-                    return false;
+                    return true;
                 }
             }
 
-            return true;
+            return false;
 
         } catch (NullPointerException e){
             return false;

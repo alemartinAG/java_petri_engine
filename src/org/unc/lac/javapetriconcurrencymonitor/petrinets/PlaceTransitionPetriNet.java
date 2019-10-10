@@ -23,15 +23,15 @@ public class PlaceTransitionPetriNet extends RootPetriNet{
 	 * @see RootPetriNet#computeEnabledTransitions()
 	 */
 	protected final boolean[] computeEnabledTransitions(){
-		boolean[] _enabledTransitions = new boolean[transitions.length];
+		//boolean[] _enabledTransitions = new boolean[transitions.length];
 		boolean[] enabledTransitions = areEnabled();
-		for(MTransition t : transitions){
-			_enabledTransitions[t.getIndex()] = isEnabled(t);
-		}
+		//for(MTransition t : transitions){
+		//	_enabledTransitions[t.getIndex()] = isEnabled(t);
+		//}
 		//System.out.println(Arrays.toString(_enabledTransitions));
-		_enabledTransitions = areEnabled();
-		if(!Arrays.equals(enabledTransitions, _enabledTransitions))
-			System.out.println("Error!!!!!!!!");
+		//_enabledTransitions = areEnabled();
+		//if(!Arrays.equals(enabledTransitions, _enabledTransitions))
+		//	System.out.println("Error!!!!!!!!");
 		return enabledTransitions;
 	}
 
