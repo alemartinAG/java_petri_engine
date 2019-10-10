@@ -28,6 +28,7 @@ public abstract class RootPetriNet {
 	protected Integer[][] post;
 	/** Incidece matrix */
 	protected Integer[][] inc;
+	protected Integer[][] inc_T;
 	protected Integer[] currentMarking;
 	protected Integer[] initialMarking;
 	protected boolean[] automaticTransitions;
@@ -97,6 +98,13 @@ public abstract class RootPetriNet {
 
 		inhibitionColumnszero = checkMatrixColumns(inhibitionMatrix);
 		readerColumnszero = checkMatrixColumns(readerMatrix);
+
+		inc_T = new Integer[inc[0].length][inc.length];
+		for(int i = 0; i < inc.length; i++){
+			for(int j = 0; j< inc[0].length; j++){
+				inc_T[i][j] = inc[j][i];
+			}
+		}
 	}
 	
 	/**
@@ -200,7 +208,7 @@ public abstract class RootPetriNet {
 			throw new IllegalArgumentException("Index " + transitionIndex + " doesn't match any transition's index in this petri net");
 		}
 		
-		if(!isEnabled(transition)){
+		if(!isEnabled(transition)){ //TODO check!!! no need to calculate again
 			return PetriNetFireOutcome.NOT_ENABLED;
 		}
 		
@@ -459,6 +467,31 @@ public abstract class RootPetriNet {
 		}
 		return true;
 		
+	}
+
+	public boolean[] areEnabled(){
+		//TODO implementar
+
+		boolean E[] = new boolean[transitions.length];
+		Arrays.fill(E,true);
+		boolean B[] = new boolean[transitions.length];
+		boolean L[] = new boolean[transitions.length];
+		//Calculo vector E con transiciones habilitadas por marca
+		//calcE()
+		for(int i = 0; i < inc_T[0].length; i++)
+			for(int j = 0; j < inc_T.length; j++){
+				if ((currentMarking[j] + inc_T[i][j]) < 0) {
+					E[i] = false;
+					break;
+				}
+			}
+		//System.out.println(Arrays.toString(E));
+		return E;
+		//Calculo vector B con transiciones des sensibilizadas por arco inhibidor B
+		//calcB()
+		//Calculo vector L con transiciones des sensibilizadas por arco lector L
+		//calcL()
+		//Calculo vector final Ex = E and B and L
 	}
 	
 	/**
