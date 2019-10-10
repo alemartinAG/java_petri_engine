@@ -40,10 +40,12 @@ public abstract class RootPetriNet {
 	
 	/** Inhibition arcs pre-incidence matrix */
 	protected Boolean[][] inhibitionMatrix;
+	protected Boolean[][] inhibitionMatrix_T;
 	/** Reset arcs pre-incidence matrix */
 	protected Boolean[][] resetMatrix;
 	/** Reader arcs pre-incidence matrix */
 	protected Integer[][] readerMatrix;
+	protected Integer[][] readerMatrix_T;
 	
 	protected boolean hasInhibitionArcs;
 	protected boolean hasResetArcs;
@@ -448,31 +450,58 @@ public abstract class RootPetriNet {
 		
 	}
 
-	public boolean[] areEnabled(){
-		//TODO implementar
+	boolean[] areEnabled(){
 
-		boolean E[] = new boolean[transitions.length];
+		boolean[] E = new boolean[transitions.length];
 		Arrays.fill(E,true);
-		boolean B[] = new boolean[transitions.length];
-		boolean L[] = new boolean[transitions.length];
+		boolean[] B = new boolean[transitions.length];
+		Arrays.fill(B,true);
+		boolean[] L = new boolean[transitions.length];
+		Arrays.fill(L,true);
 		//Calculo vector E con transiciones habilitadas por marca
 		//calcE()
-		for(int i = 0; i < inc_T.length; i++)
-			for(int j = 0; j < inc_T[i].length; j++){
+
+		int i,j;
+		for(i = 0; i < inc_T.length; i++) {
+			for (j = 0; j < inc_T[i].length; j++) {
 				if ((currentMarking[j] + inc_T[i][j]) < 0) {
 					E[i] = false;
 					break;
 				}
 			}
+		}
 		//System.out.println(Arrays.toString(E));
-		return E;
+
 		//Calculo vector B con transiciones des sensibilizadas por arco inhibidor B
-		//calcB()
+		if(hasInhibitionArcs) {
+			for (i = 0; i < inhibitionMatrix_T.length; i++) {
+				for (j = 0; j < inhibitionMatrix_T[0].length; j++) {
+					if (inhibitionMatrix_T[i][j] && currentMarking[j] != 0) {
+						B[i] = false;
+						break;
+					}
+				}
+			}
+		}
 		//Calculo vector L con transiciones des sensibilizadas por arco lector L
-		//calcL()
-		for(int i=0; i<)
+
+		if(hasReaderArcs) {
+			for (i = 0; i < readerMatrix_T.length; i++) {
+				for (j = 0; j < readerMatrix_T[0].length; j++) {
+					if (readerMatrix_T[i][j] > currentMarking[j]) {
+						L[i] = false;
+						break;
+					}
+				}
+			}
+		}
+		boolean[] enabled = new boolean[transitions.length];
+		for(i = 0; i < transitions.length; i++){
+			enabled[i] = E[i] & B[i] & L[i];
+		}
 
 		//Calculo vector final Ex = E and B and L
+		return enabled;
 	}
 	
 	/**
