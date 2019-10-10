@@ -110,8 +110,8 @@ public abstract class RootPetriNet {
 			readerMatrix_T = MatrixUtils.transpose(readerMatrix);
 		}
 
-		inhibitionColumnszero = MatrixUtils.columnsNotZero(inhibitionMatrix);
-		readerColumnszero = MatrixUtils.columnsNotZero(readerMatrix);
+        inhibitionColumnNotEmpty = MatrixUtils.columnsNotZero(inhibitionMatrix);
+        readerColumnNotEmpty = MatrixUtils.columnsNotZero(readerMatrix);
 	}
 	
 	/**
