@@ -56,6 +56,7 @@ public abstract class RootPetriNet {
 	
 	
 	protected boolean initializedPetriNet;
+	protected boolean blockedPetriNet;
 	
 	/** HashMap for guards. These variables can enable or disable associated transitions */
 	protected HashMap<String, Boolean> guards;
@@ -99,6 +100,7 @@ public abstract class RootPetriNet {
 		hasInhibitionArcs = MatrixUtils.isMatrixNonZero(inhibitionMatrix);
 		hasResetArcs = MatrixUtils.isMatrixNonZero(resetMatrix);
 		hasReaderArcs = MatrixUtils.isMatrixNonZero(readerMatrix);
+		blockedPetriNet = false;
 
 		inc_T = MatrixUtils.transpose(inc);
 
@@ -198,7 +200,10 @@ public abstract class RootPetriNet {
 		if(transitionIndex < 0 || transitionIndex > transitions.length){
 			throw new IllegalArgumentException("Index " + transitionIndex + " doesn't match any transition's index in this petri net");
 		}
-		
+
+		//boolean valor = isEnabled(transition);
+		//if(valor != enabledTransitions[transition.getIndex()])
+		//    System.out.println("Cambiaron!!");
 		if(!isEnabled(transition)){ //TODO check!!! no need to calculate again
 			return PetriNetFireOutcome.NOT_ENABLED;
 		}
@@ -212,7 +217,7 @@ public abstract class RootPetriNet {
 			}
 			places[i].setMarking(currentMarking[i]);
 		}
-		System.out.println("Disparo:" + transitionIndex);
+		//System.out.println("Disparo:" + transitionIndex);
 		enabledTransitions = computeEnabledTransitions();
 		//System.out.println("Successfully fired " + transition.getName());
 		return PetriNetFireOutcome.SUCCESS;
@@ -462,6 +467,7 @@ public abstract class RootPetriNet {
 
 	boolean[] areEnabled(){
 
+		boolean blocked = true;
 		boolean[] E = new boolean[transitions.length];
 		Arrays.fill(E,true);
 		boolean[] B = new boolean[transitions.length];
@@ -471,11 +477,10 @@ public abstract class RootPetriNet {
 		//Calculo vector E con transiciones habilitadas por marca
 		//calcE()
 
-
 		int length, height;
 		length = inc_T.length;
 		height = inc_T[0].length;
-		for(int i = 0; i < length; i++) {
+		/*for(int i = 0; i < length; i++) {
 			for (int j = 0; j < height; j++) {
 				if ((currentMarking[j] + inc_T[i][j]) < 0) {
 					E[i] = false;
@@ -483,49 +488,87 @@ public abstract class RootPetriNet {
 				}
 			}
 		}
-		System.out.println(Arrays.toString(E));
+		//System.out.println(Arrays.toString(E));
+		*/
+		int finalHeight = height;
+		IntStream.range(0, length)
+				.parallel()
+				.forEach(index -> {
+					for(int j = 0; j< finalHeight; j++){
+						if((currentMarking[j] + inc_T[index][j]) < 0){
+							E[index] = false;
+							break;
+						}
+					}
+				});
+		//System.out.println(Arrays.toString(E));
 
 		//Calculo vector B con transiciones des sensibilizadas por arco inhibidor B
 		if(hasInhibitionArcs) {
 			length = inhibitionMatrix_T.length;
 			height = inhibitionMatrix_T[0].length;
-			System.out.println("holis");
 
-			for (int i = 0; i < length; i++) {
+			/*for (int i = 0; i < length; i++) {
 				for (int j = 0; j < height; j++) {
 					if (inhibitionMatrix_T[i][j] && currentMarking[j] != 0) {
 						B[i] = false;
 						break;
 					}
 				}
-			}
+			}*/
+			int finalHeight1 = height;
+			IntStream.range(0, length)
+					.parallel()
+					.forEach(index -> {
+						for (int j = 0; j < finalHeight1; j++) {
+							if (inhibitionMatrix_T[index][j] && currentMarking[j] != 0) {
+								B[index] = false;
+								break;
+							}
+						}
+					});
 		}
 
-		System.out.println(Arrays.toString(B));
+		//System.out.println(Arrays.toString(B));
 		//Calculo vector L con transiciones des sensibilizadas por arco lector L
 
 		if(hasReaderArcs) {
 			length = readerMatrix_T.length;
 			height = readerMatrix_T[0].length;
 
-			for (int i = 0; i < length; i++) {
+			/*for (int i = 0; i < length; i++) {
 				for (int j = 0; j < height; j++) {
 					if (readerMatrix_T[i][j] > currentMarking[j]) {
 						L[i] = false;
 						break;
 					}
 				}
-			}
+			}*/
+			int finalHeight2 = height;
+			IntStream.range(0, length)
+					.parallel()
+					.forEach(index -> {
+						for (int j = 0; j < finalHeight2; j++) {
+							if (readerMatrix_T[index][j] > currentMarking[j]) {
+								L[index] = false;
+								break;
+							}
+						}
+					});
+
 		}
 
-		System.out.println(Arrays.toString(L));
+		//System.out.println(Arrays.toString(L));
 		boolean[] enabled = new boolean[transitions.length];
 		for(int i = 0; i < transitions.length; i++){
 			enabled[i] = E[i] & B[i] & L[i];
+			if(enabled[i])
+				blocked = false;
 		}
-
-		System.out.println(Arrays.toString(enabled));
+		blockedPetriNet = blocked;
+		//System.out.println(Arrays.toString(enabled));
 		//Calculo vector final Ex = E and B and L
+
 		return enabled;
 	}
 	
@@ -589,6 +632,11 @@ public abstract class RootPetriNet {
 		}
 		return false;
 	}
-	
-	
+
+	public boolean isBlockedPetriNet() {
+		return blockedPetriNet;
+	}
+
+
+
 }
