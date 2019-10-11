@@ -1,6 +1,7 @@
 package org.unc.lac.javapetriconcurrencymonitor.petrinets;
 
 import java.util.*;
+import java.util.stream.IntStream;
 
 import org.unc.lac.javapetriconcurrencymonitor.errors.IllegalTransitionFiringError;
 import org.unc.lac.javapetriconcurrencymonitor.exceptions.NotInitializedPetriNetException;
