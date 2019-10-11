@@ -591,4 +591,8 @@ public class PetriMonitor {
 		}
 		return System.currentTimeMillis()-startTime;
 	}
+
+	public boolean isNetBlocked(){
+		return  petri.isBlockedPetriNet();
+	}
 }

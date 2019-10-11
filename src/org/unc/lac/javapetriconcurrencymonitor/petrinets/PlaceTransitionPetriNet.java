@@ -4,6 +4,8 @@ import org.unc.lac.javapetriconcurrencymonitor.petrinets.components.MArc;
 import org.unc.lac.javapetriconcurrencymonitor.petrinets.components.MPlace;
 import org.unc.lac.javapetriconcurrencymonitor.petrinets.components.MTransition;
 
+import java.util.Arrays;
+
 public class PlaceTransitionPetriNet extends RootPetriNet{
 
 	/**
@@ -21,11 +23,16 @@ public class PlaceTransitionPetriNet extends RootPetriNet{
 	 * @see RootPetriNet#computeEnabledTransitions()
 	 */
 	protected final boolean[] computeEnabledTransitions(){
-		boolean[] _enabledTransitions = new boolean[transitions.length];
+
+		/*boolean[] _enabledTransitions = new boolean[transitions.length];
 		for(MTransition t : transitions){
 			_enabledTransitions[t.getIndex()] = isEnabled(t);
 		}
-		return _enabledTransitions;
+
+		_enabledTransitions = areEnabled();
+		if(!Arrays.equals(enabledTransitions, _enabledTransitions))
+			System.out.println("Error!!!!!!!!");*/
+		return areEnabled();
 	}
 
 }
