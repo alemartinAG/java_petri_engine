@@ -16,7 +16,7 @@ public class TimedPetriNet extends RootPetriNet{
 	 * The enabled transitions are not calculated at initialization time, so
 	 * before firing the first transition, they must be calculated {@link TimedPetriNet#initializePetriNet()}.
 	 * Other way to start times is firing a non timed transition before a timed transition
-	 * @see RootPetriNet#PetriNet(MPlace[], MTransition[], MArc[], Integer[], Integer[][], Integer[][], Integer[][], Boolean[][], Boolean[][], Integer[][])
+	 * @see RootPetriNet(MPlace[], MTransition[], MArc[], Integer[], Integer[][], Integer[][], Integer[][], Boolean[][], Boolean[][], Integer[][])
 	 */
 	public TimedPetriNet(MPlace[] _places, MTransition[] _transitions, MArc[] _arcs, Integer[] _initialMarking,
 			Integer[][] _preI, Integer[][] _posI, Integer[][] _I, Boolean[][] _inhibition, Boolean[][] _resetMatrix, Integer[][] _readerMatrix) {
@@ -29,8 +29,8 @@ public class TimedPetriNet extends RootPetriNet{
 	/**
 	 * Fires the transition specified by transitionIndex and updates the enabled transitions with their timestamps.
 	 * If the petri net was not initialized before calling this method, {@link NotInitializedPetriNetException} is thrown.
-	 * If the fire time is before the timespan, {@link FiringBeforeTimespanException} is thrown,
-	 * and if it's after the timespan, {@link FiringAfterTimespanException} is thrown
+	 * If the fire time is before the timespan, FiringBeforeTimespanException is thrown,
+	 * and if it's after the timespan, FiringAfterTimespanException is thrown
 	 * @param transitionIndex The index of the transition to be fired
 	 * @return True if the fire was successful
 	 * @throws IllegalArgumentException If the index is negative or greater than the last transition index.
@@ -50,8 +50,8 @@ public class TimedPetriNet extends RootPetriNet{
 	/**
 	 * Fires the specified transition and updates the enabled transitions with their timestamps.
 	 * If the petri net was not initialized before calling this method, {@link NotInitializedPetriNetException} is thrown.
-	 * If the fire time is before the timespan, {@link FiringBeforeTimespanException} is thrown,
-	 * and if it's after the timespan, {@link FiringAfterTimespanException} is thrown
+	 * If the fire time is before the timespan, FiringBeforeTimespanException is thrown,
+	 * and if it's after the timespan, FiringAfterTimespanException is thrown
 	 * @param t The transition to be fired
 	 * @return True if the fire was successful
 	 * @throws PetriNetException If an error regarding the petri occurs, for instance if the net hasn't been initialized before calling this method.

@@ -202,10 +202,7 @@ public abstract class RootPetriNet {
 			throw new IllegalArgumentException("Index " + transitionIndex + " doesn't match any transition's index in this petri net");
 		}
 
-		//boolean valor = isEnabled(transition);
-		//if(valor != enabledTransitions[transition.getIndex()])
-		//    System.out.println("Cambiaron!!");
-		if(!isEnabled(transition)){ //TODO check!!! no need to calculate again
+		if(!enabledTransitions[transitionIndex]){
 			return PetriNetFireOutcome.NOT_ENABLED;
 		}
 		
@@ -466,6 +463,12 @@ public abstract class RootPetriNet {
 		
 	}
 
+	/**
+	 * Implements state equation for petri nets enabling.
+	 * Takes into consideration transitions enabled by marking, reader and inhibition arcs.
+	 * Missing guards.
+	 * @return array with '1' on enabled transitions
+	 */
 	boolean[] areEnabled(){
 
 		boolean blocked = true;
