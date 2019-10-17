@@ -430,7 +430,9 @@ public class PetriMonitor {
 								}
 							}
 
+
 							//listOfEvents.add(transitionToFire);
+
 							try{
 								sendEventAfterFiring(transitionToFire);
 							} catch (IllegalArgumentException e){

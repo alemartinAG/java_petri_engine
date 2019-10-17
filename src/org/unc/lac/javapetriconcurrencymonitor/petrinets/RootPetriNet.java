@@ -566,7 +566,7 @@ public abstract class RootPetriNet {
 		boolean[] enabled = new boolean[transitions.length];
 		for(int i = 0; i < transitions.length; i++){
 			enabled[i] = E[i] & B[i] & L[i];
-			if(enabled[i])
+			if(enabled[i] && !automaticTransitions[i])
 				blocked = false;
 		}
 		blockedPetriNet = blocked;
