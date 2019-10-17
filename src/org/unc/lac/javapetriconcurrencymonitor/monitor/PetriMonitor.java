@@ -413,16 +413,15 @@ public class PetriMonitor {
 					{
 					case SUCCESS:
 						//the transition was fired successfully. If it's informed let's send an event
-						if(transitionsLeft != null){
-							transitionsLeft--;
-							if(transitionsLeft == 0){
-								simulationRunning = false;
-								endTime = System.currentTimeMillis();
-							}
-						}
-
 						if(!petri.isWaiting(transitionToFire))
 						{
+							if(transitionsLeft != null){
+								transitionsLeft--;
+								if(transitionsLeft == 0){
+									simulationRunning = false;
+									endTime = System.currentTimeMillis();
+								}
+							}
 							try{
 								sendEventAfterFiring(transitionToFire);
 							} catch (IllegalArgumentException e){
