@@ -1,6 +1,7 @@
 package org.unc.lac.javapetriconcurrencymonitor.monitor;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -56,6 +57,8 @@ public class PetriMonitor {
 	private long startTime;
 	private long endTime;
 
+	private ArrayList<MTransition> listOfEvents;
+
 	public PetriMonitor(final RootPetriNet _petri, TransitionsPolicy _policy) {
 		if(_petri == null || _policy == null){
 			throw new IllegalArgumentException(this.getClass().getName() + " constructor. Invalid arguments");
@@ -83,6 +86,8 @@ public class PetriMonitor {
 		for(int i = 0; i < transitionsAmount; i++){
 			anyThreadSleepingforTransition[i] = new AtomicBoolean(false);
 		}
+
+		listOfEvents = new ArrayList<>();
 	}
 
 	public PetriMonitor(final RootPetriNet _petri, TransitionsPolicy _policy, int _transitions){
@@ -413,16 +418,19 @@ public class PetriMonitor {
 					{
 					case SUCCESS:
 						//the transition was fired successfully. If it's informed let's send an event
-						if(transitionsLeft != null){
-							transitionsLeft--;
-							if(transitionsLeft == 0){
-								simulationRunning = false;
-								endTime = System.currentTimeMillis();
-							}
-						}
 
 						if(!petri.isWaiting(transitionToFire))
 						{
+
+							if(transitionsLeft != null){
+								transitionsLeft--;
+								if(transitionsLeft == 0){
+									simulationRunning = false;
+									endTime = System.currentTimeMillis();
+								}
+							}
+
+							//listOfEvents.add(transitionToFire);
 							try{
 								sendEventAfterFiring(transitionToFire);
 							} catch (IllegalArgumentException e){
@@ -594,5 +602,9 @@ public class PetriMonitor {
 
 	public boolean isNetBlocked(){
 		return  petri.isBlockedPetriNet();
+	}
+
+	public ArrayList<MTransition> getListOfEvents(){
+		return listOfEvents;
 	}
 }
