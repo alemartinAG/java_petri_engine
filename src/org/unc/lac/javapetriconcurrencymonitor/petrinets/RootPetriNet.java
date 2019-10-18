@@ -126,10 +126,19 @@ public abstract class RootPetriNet {
 	/**
 	 * Initialize the petri net and computes enabled transitions for the first time.
 	 * This method must be called before being ready to fire a transition.
+	 * Verifies that there is at least one non automatic transition enabled
 	 * @see RootPetriNet#computeEnabledTransitions()
 	 */
 	public void initializePetriNet(){
 		enabledTransitions = computeEnabledTransitions();
+
+		boolean blocked = true;
+		for(int i = 0; i < enabledTransitions.length; i++){
+			if(enabledTransitions[i] && !automaticTransitions[i])
+				blocked = false;
+		}
+		blockedPetriNet = blocked;
+
 		initializedPetriNet = true;
 	}
 	
@@ -566,7 +575,7 @@ public abstract class RootPetriNet {
 		boolean[] enabled = new boolean[transitions.length];
 		for(int i = 0; i < transitions.length; i++){
 			enabled[i] = E[i] & B[i] & L[i];
-			if(enabled[i] && !automaticTransitions[i])
+			if(enabled[i])
 				blocked = false;
 		}
 		blockedPetriNet = blocked;
