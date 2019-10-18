@@ -27,6 +27,8 @@ import rx.subjects.PublishSubject;
 
 public class PetriMonitor {
 
+	public static final int  TID = 0;
+	public static final int TIME = 1;
 	public static boolean simulationRunning = false;
 
 	/** Petri Net to command the monitor orchestration */
@@ -57,7 +59,7 @@ public class PetriMonitor {
 	private long startTime;
 	private long endTime;
 
-	private ArrayList<MTransition> listOfEvents;
+	private ArrayList<String[]> listOfEvents;
 
 	public PetriMonitor(final RootPetriNet _petri, TransitionsPolicy _policy) {
 		if(_petri == null || _policy == null){
@@ -430,14 +432,12 @@ public class PetriMonitor {
 								}
 							}
 
-
-							//listOfEvents.add(transitionToFire);
-
-							try{
-								sendEventAfterFiring(transitionToFire);
-							} catch (IllegalArgumentException e){
-								//nothing wrong, the transition is not informed
-							}
+							if(transitionToFire.getLabel().isInformed()){
+                                if(petri.isStochastic(transitionToFire))
+                                    listOfEvents.add(new String[]{transitionToFire.getId(), String.valueOf(transitionToFire.getLastTime())});
+                                else
+                                    listOfEvents.add(new String[]{transitionToFire.getId()});
+                            }
 						}
 
 						boolean automaticTransitions[] = petri.getAutomaticTransitions();
@@ -606,7 +606,7 @@ public class PetriMonitor {
 		return  petri.isBlockedPetriNet();
 	}
 
-	public ArrayList<MTransition> getListOfEvents(){
+	public ArrayList<String[]> getListOfEvents(){
 		return listOfEvents;
 	}
 }
