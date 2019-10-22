@@ -2,7 +2,6 @@ package org.unc.lac.javapetriconcurrencymonitor.petrinets.factory;
 
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 import org.javatuples.Quartet;
 import org.javatuples.Sextet;
@@ -10,6 +9,7 @@ import org.javatuples.Triplet;
 import org.unc.lac.javapetriconcurrencymonitor.errors.CannotCreatePetriNetError;
 import org.unc.lac.javapetriconcurrencymonitor.exceptions.BadPnmlFormatException;
 import org.unc.lac.javapetriconcurrencymonitor.parser.PnmlParser;
+import org.unc.lac.javapetriconcurrencymonitor.petrinets.CudaPetriNet;
 import org.unc.lac.javapetriconcurrencymonitor.petrinets.RootPetriNet;
 import org.unc.lac.javapetriconcurrencymonitor.petrinets.PlaceTransitionPetriNet;
 import org.unc.lac.javapetriconcurrencymonitor.petrinets.TimedPetriNet;
@@ -32,7 +32,8 @@ import org.unc.lac.javapetriconcurrencymonitor.petrinets.components.MArc.ArcType
 		 */
 		public static enum petriNetType {
 			PLACE_TRANSITION,
-			TIMED
+			TIMED,
+			CUDA
 		};
 		
 		public PetriNetFactory(String pathToPNML) throws NullPointerException{
@@ -69,6 +70,9 @@ import org.unc.lac.javapetriconcurrencymonitor.petrinets.components.MArc.ArcType
 						petriMatrices.getValue0(), petriMatrices.getValue1(), petriMatrices.getValue2(), petriMatrices.getValue3(), petriMatrices.getValue4(), petriMatrices.getValue5());
 			case TIMED:
 				return new TimedPetriNet(petriComponents.getValue0(), petriComponents.getValue1(), petriComponents.getValue2(), petriComponents.getValue3(),
+						petriMatrices.getValue0(), petriMatrices.getValue1(), petriMatrices.getValue2(), petriMatrices.getValue3(), petriMatrices.getValue4(), petriMatrices.getValue5());
+			case CUDA:
+				return new CudaPetriNet(petriComponents.getValue0(), petriComponents.getValue1(), petriComponents.getValue2(), petriComponents.getValue3(),
 						petriMatrices.getValue0(), petriMatrices.getValue1(), petriMatrices.getValue2(), petriMatrices.getValue3(), petriMatrices.getValue4(), petriMatrices.getValue5());
 			default:
 				throw new CannotCreatePetriNetError("Cannot create petri net from unknown type " + type);
