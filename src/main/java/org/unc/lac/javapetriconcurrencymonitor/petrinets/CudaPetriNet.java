@@ -21,9 +21,7 @@ import org.unc.lac.javapetriconcurrencymonitor.petrinets.components.MTransition;
 
 import java.io.InputStream;
 import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 public class CudaPetriNet extends RootPetriNet {
 
@@ -93,11 +91,19 @@ public class CudaPetriNet extends RootPetriNet {
         Integer [][] inh = booltoInt(inhibitionMatrix);
         Integer [][] res = booltoInt(resetMatrix);
 
-        String matrices_json = 	gson.toJson(inc) + "\n";/* +
+        Map<String, Object> matrices = new HashMap<>();
+        matrices.put("incidence",inc);
+        matrices.put("inhibition",inh);
+        matrices.put("reader",readerMatrix);
+        matrices.put("reset",res);
+        matrices.put("marking",currentMarking);
+
+       /*  String matrices_json = 	gson.toJson(inc) + "\n";+
                 gson.toJson(inh) + "\n" +
                 gson.toJson(readerMatrix) +"\n" +
                 gson.toJson(res) +"\n" +
                 gson.toJson(currentMarking);*/
+       String matrices_json = gson.toJson(matrices);
 
 
         return matrices_json;
@@ -169,14 +175,11 @@ public class CudaPetriNet extends RootPetriNet {
             HttpClient httpclient = HttpClients.createDefault();
             HttpPost httppost= new HttpPost("http://localhost:8080/matrices");
 
-            List<NameValuePair> param = new ArrayList<>(2);
             String matrices = matricesToJSON();
             System.out.println(matrices);
 
             StringEntity ent = new StringEntity(matrices);
 
-            param.add(new BasicNameValuePair("matrices",matrices));
-            param.add(new BasicNameValuePair("valor","Holis"));
             httppost.setEntity(ent);
             httppost.setHeader("Accept","application/json");
             httppost.setHeader("Content-type","application/json");
