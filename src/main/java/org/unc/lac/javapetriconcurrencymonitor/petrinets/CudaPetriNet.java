@@ -1,6 +1,15 @@
 package org.unc.lac.javapetriconcurrencymonitor.petrinets;
 
 import com.google.gson.Gson;
+import org.apache.commons.io.IOUtils;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.message.BasicNameValuePair;
 import org.unc.lac.javapetriconcurrencymonitor.exceptions.NotInitializedPetriNetException;
 import org.unc.lac.javapetriconcurrencymonitor.exceptions.PetriNetException;
 import org.unc.lac.javapetriconcurrencymonitor.petrinets.PetriNetFireOutcome;
@@ -9,7 +18,11 @@ import org.unc.lac.javapetriconcurrencymonitor.petrinets.components.MArc;
 import org.unc.lac.javapetriconcurrencymonitor.petrinets.components.MPlace;
 import org.unc.lac.javapetriconcurrencymonitor.petrinets.components.MTransition;
 
+import java.io.InputStream;
+import java.io.StringWriter;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 public class CudaPetriNet extends RootPetriNet {
 
@@ -84,6 +97,39 @@ public class CudaPetriNet extends RootPetriNet {
         }
 
         return mat_int;
+
+    }
+
+    void sendToCuda(){
+
+        try {
+
+            HttpClient httpclient = HttpClients.createDefault();
+            HttpPost httppost = new HttpPost("http://localhost:8080/compute");
+
+            // Request parameters and other properties.
+            List<NameValuePair> params = new ArrayList<NameValuePair>(2);
+            params.add(new BasicNameValuePair("param-1", "12345"));
+            params.add(new BasicNameValuePair("param-2", "Hello!"));
+            httppost.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
+
+            //Execute and get the response.
+            HttpResponse response = httpclient.execute(httppost);
+            HttpEntity entity = response.getEntity();
+
+            if (entity != null) {
+                try (InputStream instream = entity.getContent()) {
+                    // do something useful
+                    StringWriter writer = new StringWriter();
+                    IOUtils.copy(instream, writer, "UTF-8");
+                    System.out.println(writer.toString());
+                }
+            }
+
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
 
     }
 }

@@ -485,38 +485,6 @@ public abstract class RootPetriNet {
 		
 	}
 
-	void sendToCuda(){
-
-		try {
-
-			HttpClient httpclient = HttpClients.createDefault();
-			HttpPost httppost = new HttpPost("http://localhost:8080/compute");
-
-			// Request parameters and other properties.
-			List<NameValuePair> params = new ArrayList<NameValuePair>(2);
-			params.add(new BasicNameValuePair("param-1", "12345"));
-			params.add(new BasicNameValuePair("param-2", "Hello!"));
-			httppost.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
-
-			//Execute and get the response.
-			HttpResponse response = httpclient.execute(httppost);
-			HttpEntity entity = response.getEntity();
-
-			if (entity != null) {
-				try (InputStream instream = entity.getContent()) {
-					// do something useful
-					StringWriter writer = new StringWriter();
-					IOUtils.copy(instream, writer, "UTF-8");
-					System.out.println(writer.toString());
-				}
-			}
-
-		}
-		catch (Exception e){
-			e.printStackTrace();
-		}
-
-	}
 
 	/**
 	 * Implements state equation for petri nets enabling.
@@ -525,8 +493,6 @@ public abstract class RootPetriNet {
 	 * @return array with '1' on enabled transitions
 	 */
 	boolean[] areEnabled(){
-
-		sendToCuda();
 
 		boolean blocked = true;
 		boolean[] E = new boolean[transitions.length];
