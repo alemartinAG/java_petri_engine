@@ -8,6 +8,7 @@ import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.unc.lac.javapetriconcurrencymonitor.exceptions.NotInitializedPetriNetException;
@@ -42,16 +43,42 @@ public class CudaPetriNet extends RootPetriNet {
      */
     public CudaPetriNet(MPlace[] _places, MTransition[] _transitions, MArc[] _arcs, Integer[] _initialMarking, Integer[][] _preI, Integer[][] _posI, Integer[][] _I, Boolean[][] _inhibitionMatrix, Boolean[][] _resetMatrix, Integer[][] _readerMatrix) {
         super(_places, _transitions, _arcs, _initialMarking, _preI, _posI, _I, _inhibitionMatrix, _resetMatrix, _readerMatrix);
+        //TODO send matrices
+        sendMatrices();
     }
 
     @Override
     protected boolean[] computeEnabledTransitions() {
+        //todo needs to return value calculated by cuda
+        //areEnabledCuda();
         return areEnabled();
     }
 
     @Override
     public synchronized PetriNetFireOutcome fire(final MTransition transition) throws IllegalArgumentException, NotInitializedPetriNetException, PetriNetException {
-        //TODO implemet
+        //TODO implement
+
+        if(transition == null){
+            throw new IllegalArgumentException("Null Transition passed as argument");
+        }
+        if(!initializedPetriNet){
+            throw new NotInitializedPetriNetException();
+        }
+
+        int transitionIndex = transition.getIndex();
+
+        if(transitionIndex < 0 || transitionIndex > transitions.length){
+            throw new IllegalArgumentException("Index " + transitionIndex + " doesn't match any transition's index in this petri net");
+        }
+
+        if(!enabledTransitions[transitionIndex]){
+            return PetriNetFireOutcome.NOT_ENABLED;
+        }
+
+        //todo insert communication with cuda, including firing of the transition plus the enabling
+        //todo fire method in cuda must return enabled transition vector
+        //enabledTransitions = cudaFire(transitionIndex)
+
         return PetriNetFireOutcome.SUCCESS;
     }
 
@@ -66,11 +93,11 @@ public class CudaPetriNet extends RootPetriNet {
         Integer [][] inh = booltoInt(inhibitionMatrix);
         Integer [][] res = booltoInt(resetMatrix);
 
-        String matrices_json = 	gson.toJson(inc) + "\n" +
+        String matrices_json = 	gson.toJson(inc) + "\n";/* +
                 gson.toJson(inh) + "\n" +
                 gson.toJson(readerMatrix) +"\n" +
                 gson.toJson(res) +"\n" +
-                gson.toJson(currentMarking);
+                gson.toJson(currentMarking);*/
 
 
         return matrices_json;
@@ -100,6 +127,7 @@ public class CudaPetriNet extends RootPetriNet {
 
     }
 
+
     void sendToCuda(){
 
         try {
@@ -114,6 +142,45 @@ public class CudaPetriNet extends RootPetriNet {
             httppost.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
 
             //Execute and get the response.
+
+            HttpResponse response = httpclient.execute(httppost);
+            HttpEntity entity = response.getEntity();
+
+            if (entity != null) {
+                try (InputStream instream = entity.getContent()) {
+                    // do something useful
+                    StringWriter writer = new StringWriter();
+                    IOUtils.copy(instream, writer, "UTF-8");
+                    System.out.println(writer.toString());
+                }
+            }
+
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+
+    }
+
+    private void sendMatrices(){
+
+        try{
+
+            HttpClient httpclient = HttpClients.createDefault();
+            HttpPost httppost= new HttpPost("http://localhost:8080/matrices");
+
+            List<NameValuePair> param = new ArrayList<>(2);
+            String matrices = matricesToJSON();
+            System.out.println(matrices);
+
+            StringEntity ent = new StringEntity(matrices);
+
+            param.add(new BasicNameValuePair("matrices",matrices));
+            param.add(new BasicNameValuePair("valor","Holis"));
+            httppost.setEntity(ent);
+            httppost.setHeader("Accept","application/json");
+            httppost.setHeader("Content-type","application/json");
+
             HttpResponse response = httpclient.execute(httppost);
             HttpEntity entity = response.getEntity();
 
