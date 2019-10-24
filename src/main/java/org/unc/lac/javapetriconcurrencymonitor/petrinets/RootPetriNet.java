@@ -526,7 +526,7 @@ public abstract class RootPetriNet {
 	 */
 	boolean[] areEnabled(){
 
-		sendToCuda();
+		//sendToCuda();
 
 		boolean blocked = true;
 		boolean[] E = new boolean[transitions.length];
