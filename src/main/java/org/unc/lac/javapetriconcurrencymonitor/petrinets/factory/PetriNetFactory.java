@@ -54,7 +54,7 @@ import org.unc.lac.javapetriconcurrencymonitor.petrinets.components.MArc.ArcType
 		/**
 		 * makes and returns the petri described in the PNML file passed to the factory
 		 * @return PetriNet object containing info described in PNML file
-		 * @param petriNetType petri net type from enum type {@link petriNetType}
+		 * @param type petri net type from enum type {@link petriNetType}
 		 * @throws CannotCreatePetriNetError If any a non supported arc type is given,
 		 * or if a transition that has a reset arc as input has another arc as input
 		 */
