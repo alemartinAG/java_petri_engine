@@ -38,7 +38,7 @@ public class CudaPetriNet extends RootPetriNet {
 
     @Override
     public synchronized PetriNetFireOutcome fire(final MTransition transition) throws IllegalArgumentException, NotInitializedPetriNetException, PetriNetException {
-
+        //TODO implemet
         return PetriNetFireOutcome.SUCCESS;
     }
 
