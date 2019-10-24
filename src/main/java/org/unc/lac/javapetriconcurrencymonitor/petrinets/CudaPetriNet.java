@@ -80,6 +80,16 @@ public class CudaPetriNet extends RootPetriNet {
         return PetriNetFireOutcome.SUCCESS;
     }
 
+    public class JsonMatrices{
+        public String matrix;
+        public Integer[][] values;
+
+        public JsonMatrices(String matrix, Integer[][] values){
+            this.matrix = matrix;
+            this.values = values;
+        }
+    }
+
     /**
      * Method used to convert matrices to a json format, needed to send via http
      * @return string containing all matrices used in json format
@@ -90,23 +100,18 @@ public class CudaPetriNet extends RootPetriNet {
 
         Integer [][] inh = booltoInt(inhibitionMatrix);
         Integer [][] res = booltoInt(resetMatrix);
+        Integer [][] mark = new Integer[1][];
+        mark[0] = currentMarking;
 
-        Map<String, Object> matrices = new HashMap<>();
-        matrices.put("incidence",inc);
-        matrices.put("inhibition",inh);
-        matrices.put("reader",readerMatrix);
-        matrices.put("reset",res);
-        matrices.put("marking",currentMarking);
+        ArrayList<JsonMatrices> matrices = new ArrayList<>();
 
-       /*  String matrices_json = 	gson.toJson(inc) + "\n";+
-                gson.toJson(inh) + "\n" +
-                gson.toJson(readerMatrix) +"\n" +
-                gson.toJson(res) +"\n" +
-                gson.toJson(currentMarking);*/
-       String matrices_json = gson.toJson(matrices);
+        matrices.add(new JsonMatrices("Incidence", inc));
+        matrices.add(new JsonMatrices("Inhibition", inh));
+        matrices.add(new JsonMatrices("Reader", readerMatrix));
+        matrices.add(new JsonMatrices("Reset", res));
+        matrices.add(new JsonMatrices("Marking", mark));
 
-
-        return matrices_json;
+        return gson.toJson(matrices);
     }
 
     /**
@@ -173,7 +178,7 @@ public class CudaPetriNet extends RootPetriNet {
         try{
 
             HttpClient httpclient = HttpClients.createDefault();
-            HttpPost httppost= new HttpPost("http://localhost:8080/matrices");
+            HttpPost httppost= new HttpPost("http://localhost:8080/compute");
 
             String matrices = matricesToJSON();
             System.out.println(matrices);
