@@ -25,6 +25,8 @@ import java.util.*;
 
 public class CudaPetriNet extends RootPetriNet {
 
+    private String serverIP;
+
     /**
      * Makes a PetriNet Object. This is intended to be used by PetriNetFactory
      *
@@ -41,8 +43,6 @@ public class CudaPetriNet extends RootPetriNet {
      */
     public CudaPetriNet(MPlace[] _places, MTransition[] _transitions, MArc[] _arcs, Integer[] _initialMarking, Integer[][] _preI, Integer[][] _posI, Integer[][] _I, Boolean[][] _inhibitionMatrix, Boolean[][] _resetMatrix, Integer[][] _readerMatrix) {
         super(_places, _transitions, _arcs, _initialMarking, _preI, _posI, _I, _inhibitionMatrix, _resetMatrix, _readerMatrix);
-        //TODO send matrices
-        sendMatrices();
     }
 
     @Override
@@ -94,7 +94,7 @@ public class CudaPetriNet extends RootPetriNet {
      * Method used to convert matrices to a json format, needed to send via http
      * @return string containing all matrices used in json format
      */
-    public String matricesToJSON(){
+    private String matricesToJSON(){
 
         Gson gson = new Gson();
 
@@ -178,7 +178,7 @@ public class CudaPetriNet extends RootPetriNet {
         try{
 
             HttpClient httpclient = HttpClients.createDefault();
-            HttpPost httppost= new HttpPost("http://localhost:8080/compute");
+            HttpPost httppost= new HttpPost(serverIP + "/matrices");
 
             String matrices = matricesToJSON();
             System.out.println(matrices);
@@ -207,4 +207,15 @@ public class CudaPetriNet extends RootPetriNet {
         }
 
     }
+
+    public void setServerIP(String serverIP){
+        System.out.println(serverIP);
+        this.serverIP = serverIP;
+    }
+
+    public void initializeCuda(String serverIP){
+        setServerIP(serverIP);
+        sendMatrices();
+    }
+
 }
