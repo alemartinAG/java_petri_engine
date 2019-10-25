@@ -173,7 +173,7 @@ public class CudaPetriNet extends RootPetriNet {
 
     }
 
-    private void sendMatrices(){
+    private boolean sendMatrices(){
 
         try{
 
@@ -198,24 +198,32 @@ public class CudaPetriNet extends RootPetriNet {
                     StringWriter writer = new StringWriter();
                     IOUtils.copy(instream, writer, "UTF-8");
                     System.out.println(writer.toString());
+
+                    if(writer.toString().equals("SUCCESS")){
+                        return true;
+                    }
                 }
+            }
+            else{
+                return false;
             }
 
         }
         catch (Exception e){
             e.printStackTrace();
         }
+        return false;
 
     }
 
-    public void setServerIP(String serverIP){
+    private void setServerIP(String serverIP){
         System.out.println(serverIP);
         this.serverIP = serverIP;
     }
 
-    public void initializeCuda(String serverIP){
+    public boolean initializeCuda(String serverIP){
         setServerIP(serverIP);
-        sendMatrices();
+        return sendMatrices();
     }
 
 }
