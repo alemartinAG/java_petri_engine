@@ -81,12 +81,19 @@ public class CudaPetriNet extends RootPetriNet {
     }
 
     public class JsonMatrices{
-        public String matrix;
-        public Integer[][] values;
+        String matrix;
+        Integer[][] values;
+        //public String values = "";
+        int rows;
+        int columns;
 
-        public JsonMatrices(String matrix, Integer[][] values){
+        JsonMatrices(String matrix, Integer[][] values){
+
             this.matrix = matrix;
+            this.rows = values.length;
+            this.columns = values[0].length;
             this.values = values;
+
         }
     }
 
@@ -138,47 +145,13 @@ public class CudaPetriNet extends RootPetriNet {
 
     }
 
-
-    void sendToCuda(){
-
-        try {
-
-            HttpClient httpclient = HttpClients.createDefault();
-            HttpPost httppost = new HttpPost("http://localhost:8080/compute");
-
-            // Request parameters and other properties.
-            List<NameValuePair> params = new ArrayList<NameValuePair>(2);
-            params.add(new BasicNameValuePair("param-1", "12345"));
-            params.add(new BasicNameValuePair("param-2", "Hello!"));
-            httppost.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
-
-            //Execute and get the response.
-
-            HttpResponse response = httpclient.execute(httppost);
-            HttpEntity entity = response.getEntity();
-
-            if (entity != null) {
-                try (InputStream instream = entity.getContent()) {
-                    // do something useful
-                    StringWriter writer = new StringWriter();
-                    IOUtils.copy(instream, writer, "UTF-8");
-                    System.out.println(writer.toString());
-                }
-            }
-
-        }
-        catch (Exception e){
-            e.printStackTrace();
-        }
-
-    }
-
+    //TODO: un solo metodo?
     private boolean sendMatrices(){
 
         try{
 
             HttpClient httpclient = HttpClients.createDefault();
-            HttpPost httppost= new HttpPost(serverIP + "/matrices");
+            HttpPost httppost= new HttpPost(serverIP);
 
             String matrices = matricesToJSON();
             System.out.println(matrices);
@@ -194,9 +167,11 @@ public class CudaPetriNet extends RootPetriNet {
 
             if (entity != null) {
                 try (InputStream instream = entity.getContent()) {
-                    // do something useful
+
                     StringWriter writer = new StringWriter();
                     IOUtils.copy(instream, writer, "UTF-8");
+
+                    //TODO: borrar
                     System.out.println(writer.toString());
 
                     if(writer.toString().equals("SUCCESS")){
@@ -210,7 +185,7 @@ public class CudaPetriNet extends RootPetriNet {
 
         }
         catch (Exception e){
-            e.printStackTrace();
+            System.out.println("There was an error trying to connect to the server");
         }
         return false;
 
