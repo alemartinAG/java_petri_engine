@@ -51,14 +51,11 @@ public class CudaPetriNet extends RootPetriNet {
 
     @Override
     protected boolean[] computeEnabledTransitions() {
-        //todo needs to return value calculated by cuda
-        //areEnabledCuda();
-        return areEnabled();
+        return enabledTransitions;
     }
 
     @Override
     public synchronized PetriNetFireOutcome fire(final MTransition transition) throws IllegalArgumentException, NotInitializedPetriNetException, PetriNetException {
-        //TODO implement
 
         if(transition == null){
             throw new IllegalArgumentException("Null Transition passed as argument");
@@ -77,9 +74,7 @@ public class CudaPetriNet extends RootPetriNet {
             return PetriNetFireOutcome.NOT_ENABLED;
         }
 
-        //todo insert communication with cuda, including firing of the transition plus the enabling
-        //todo fire method in cuda must return enabled transition vector
-        //enabledTransitions = cudaFire(transitionIndex)
+        sendMatrices("fire", Integer.toString(transitionIndex));
 
         return PetriNetFireOutcome.SUCCESS;
     }
@@ -179,6 +174,8 @@ public class CudaPetriNet extends RootPetriNet {
 
                     //TODO: borrar
                     System.out.println(writer.toString());
+
+
 
 
                 }
