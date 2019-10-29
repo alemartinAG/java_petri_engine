@@ -5,6 +5,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
+import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
@@ -19,8 +20,11 @@ import org.unc.lac.javapetriconcurrencymonitor.petrinets.components.MArc;
 import org.unc.lac.javapetriconcurrencymonitor.petrinets.components.MPlace;
 import org.unc.lac.javapetriconcurrencymonitor.petrinets.components.MTransition;
 
+import javax.swing.*;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
+import java.io.UnsupportedEncodingException;
 import java.util.*;
 
 public class CudaPetriNet extends RootPetriNet {
@@ -145,18 +149,20 @@ public class CudaPetriNet extends RootPetriNet {
 
     }
 
-    //TODO: un solo metodo?
-    private boolean sendMatrices(){
+    /**
+     *
+     * @param path
+     * @param json
+     * @return
+     */
+    private boolean sendMatrices(String path, String json){
 
         try{
 
             HttpClient httpclient = HttpClients.createDefault();
-            HttpPost httppost= new HttpPost(serverIP);
+            HttpPost httppost= new HttpPost(serverIP + "/" + path);
 
-            String matrices = matricesToJSON();
-            System.out.println(matrices);
-
-            StringEntity ent = new StringEntity(matrices);
+            StringEntity ent = new StringEntity(json);
 
             httppost.setEntity(ent);
             httppost.setHeader("Accept","application/json");
@@ -174,9 +180,7 @@ public class CudaPetriNet extends RootPetriNet {
                     //TODO: borrar
                     System.out.println(writer.toString());
 
-                    if(writer.toString().equals("SUCCESS")){
-                        return true;
-                    }
+
                 }
             }
             else{
@@ -184,10 +188,17 @@ public class CudaPetriNet extends RootPetriNet {
             }
 
         }
-        catch (Exception e){
-            System.out.println("There was an error trying to connect to the server");
+        catch (UnsupportedEncodingException e) {
+            JOptionPane.showMessageDialog(null, "Connection to server failed");
+            return false;
+        } catch (ClientProtocolException e) {
+            JOptionPane.showMessageDialog(null, "Connection to server failed");
+            return false;
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(null, "No response received from server");
+            return false;
         }
-        return false;
+        return true;
 
     }
 
@@ -198,7 +209,7 @@ public class CudaPetriNet extends RootPetriNet {
 
     public boolean initializeCuda(String serverIP){
         setServerIP(serverIP);
-        return sendMatrices();
+        return sendMatrices("matrices", matricesToJSON());
     }
 
 }
