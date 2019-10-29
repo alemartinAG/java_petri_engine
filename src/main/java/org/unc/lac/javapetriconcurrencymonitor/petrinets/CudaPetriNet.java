@@ -98,7 +98,7 @@ public class CudaPetriNet extends RootPetriNet {
 
     public class JsonResponse{
         String status;
-        Integer[] vector;
+        boolean[] vector;
     }
 
     /**
@@ -178,9 +178,18 @@ public class CudaPetriNet extends RootPetriNet {
                     IOUtils.copy(instream, writer, "UTF-8");
 
                     Gson gson = new Gson();
+
                     JsonResponse svResponse = gson.fromJson(writer.toString(), JsonResponse.class);
 
+                    if(!svResponse.status.equals("SUCCESS")){
+                        JOptionPane.showMessageDialog(null, "Internal server Error");
+                        return false;
+                    }
 
+                    System.out.println("Vector:" + Arrays.toString(svResponse.vector));
+
+                    //enabledTransitions = new boolean[transitions.length];
+                    enabledTransitions = svResponse.vector.clone();
 
                 }
             }
