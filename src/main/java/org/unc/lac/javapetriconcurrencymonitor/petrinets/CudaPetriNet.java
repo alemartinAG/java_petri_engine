@@ -97,6 +97,11 @@ public class CudaPetriNet extends RootPetriNet {
         }
     }
 
+    public class JsonResponse{
+        String status;
+        Integer[] vector;
+    }
+
     /**
      * Method used to convert matrices to a json format, needed to send via http
      * @return string containing all matrices used in json format
@@ -151,7 +156,7 @@ public class CudaPetriNet extends RootPetriNet {
         try{
 
             HttpClient httpclient = HttpClients.createDefault();
-            HttpPost httppost= new HttpPost(serverIP);
+            HttpPost httppost= new HttpPost(serverIP+"/matrices");
 
             String matrices = matricesToJSON();
             System.out.println(matrices);
@@ -170,6 +175,11 @@ public class CudaPetriNet extends RootPetriNet {
 
                     StringWriter writer = new StringWriter();
                     IOUtils.copy(instream, writer, "UTF-8");
+
+                    Gson gson = new Gson();
+                    JsonResponse svResponse = gson.fromJson(writer.toString(), JsonResponse.class);
+
+                    System.out.printf("STATUS: %s - - - VECTOR: %s\n", svResponse.status, Arrays.toString(svResponse.vector));
 
                     //TODO: borrar
                     System.out.println(writer.toString());
