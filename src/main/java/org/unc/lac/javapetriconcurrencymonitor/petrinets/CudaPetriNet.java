@@ -4,18 +4,13 @@ import com.google.gson.Gson;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClients;
-import org.apache.http.message.BasicNameValuePair;
 import org.unc.lac.javapetriconcurrencymonitor.exceptions.NotInitializedPetriNetException;
 import org.unc.lac.javapetriconcurrencymonitor.exceptions.PetriNetException;
-import org.unc.lac.javapetriconcurrencymonitor.petrinets.PetriNetFireOutcome;
-import org.unc.lac.javapetriconcurrencymonitor.petrinets.RootPetriNet;
 import org.unc.lac.javapetriconcurrencymonitor.petrinets.components.MArc;
 import org.unc.lac.javapetriconcurrencymonitor.petrinets.components.MPlace;
 import org.unc.lac.javapetriconcurrencymonitor.petrinets.components.MTransition;
@@ -74,15 +69,17 @@ public class CudaPetriNet extends RootPetriNet {
             return PetriNetFireOutcome.NOT_ENABLED;
         }
 
-        sendMatrices("fire", Integer.toString(transitionIndex));
+        sendToServer("fire", Integer.toString(transitionIndex));
 
         return PetriNetFireOutcome.SUCCESS;
     }
 
+    /**
+     * Structure to parse matrices into JSON
+     */
     public class JsonMatrices{
         String matrix;
         Integer[][] values;
-        //public String values = "";
         int rows;
         int columns;
 
@@ -96,6 +93,9 @@ public class CudaPetriNet extends RootPetriNet {
         }
     }
 
+    /**
+     * Structure to parse server's JSON response
+     */
     public class JsonResponse{
         String status;
         boolean[] vector;
@@ -150,19 +150,19 @@ public class CudaPetriNet extends RootPetriNet {
     }
 
     /**
-     *
-     * @param path
-     * @param json
-     * @return
+     * Sends a string to a remote server
+     * @param path URL's path
+     * @param data string to send to the server
+     * @return true if response's status was SUCCESSFUL; false otherwise
      */
-    private boolean sendMatrices(String path, String json){
+    private boolean sendToServer(String path, String data){
 
         try{
 
             HttpClient httpclient = HttpClients.createDefault();
             HttpPost httppost= new HttpPost(serverIP + "/" + path);
 
-            StringEntity ent = new StringEntity(json);
+            StringEntity ent = new StringEntity(data);
 
             httppost.setEntity(ent);
             httppost.setHeader("Accept","application/json");
@@ -186,9 +186,6 @@ public class CudaPetriNet extends RootPetriNet {
                         return false;
                     }
 
-                    System.out.println("Vector:" + Arrays.toString(svResponse.vector));
-
-                    //enabledTransitions = new boolean[transitions.length];
                     enabledTransitions = svResponse.vector.clone();
 
                 }
@@ -199,13 +196,10 @@ public class CudaPetriNet extends RootPetriNet {
 
         }
         catch (UnsupportedEncodingException e) {
-            JOptionPane.showMessageDialog(null, "Connection to server failed");
-            return false;
-        } catch (ClientProtocolException e) {
-            JOptionPane.showMessageDialog(null, "Connection to server failed");
+            JOptionPane.showMessageDialog(null, "Error while sending data");
             return false;
         } catch (IOException e) {
-            JOptionPane.showMessageDialog(null, "No response received from server");
+            JOptionPane.showMessageDialog(null, "Connection to server failed");
             return false;
         }
         return true;
@@ -219,7 +213,7 @@ public class CudaPetriNet extends RootPetriNet {
 
     public boolean initializeCuda(String serverIP){
         setServerIP(serverIP);
-        return sendMatrices("matrices", matricesToJSON());
+        return sendToServer("matrices", matricesToJSON());
     }
 
 }
