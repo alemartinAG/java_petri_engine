@@ -35,8 +35,10 @@ local.properties
 
 lib/*
 !resources/*
+!pom.xml
 
 # ignore compiled javadoc
 
 doc/javadoc/
 .idea/
+src/main/java/META-INF/

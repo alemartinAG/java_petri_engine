@@ -1,6 +1,7 @@
 package org.unc.lac.javapetriconcurrencymonitor.monitor;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -26,6 +27,8 @@ import rx.subjects.PublishSubject;
 
 public class PetriMonitor {
 
+	public static final int  TID = 0;
+	public static final int TIME = 1;
 	public static boolean simulationRunning = false;
 
 	/** Petri Net to command the monitor orchestration */
@@ -56,6 +59,8 @@ public class PetriMonitor {
 	private long startTime;
 	private long endTime;
 
+	private ArrayList<String[]> listOfEvents;
+
 	public PetriMonitor(final RootPetriNet _petri, TransitionsPolicy _policy) {
 		if(_petri == null || _policy == null){
 			throw new IllegalArgumentException(this.getClass().getName() + " constructor. Invalid arguments");
@@ -83,6 +88,8 @@ public class PetriMonitor {
 		for(int i = 0; i < transitionsAmount; i++){
 			anyThreadSleepingforTransition[i] = new AtomicBoolean(false);
 		}
+
+		listOfEvents = new ArrayList<>();
 	}
 
 	public PetriMonitor(final RootPetriNet _petri, TransitionsPolicy _policy, int _transitions){
@@ -413,21 +420,24 @@ public class PetriMonitor {
 					{
 					case SUCCESS:
 						//the transition was fired successfully. If it's informed let's send an event
-						if(transitionsLeft != null){
-							transitionsLeft--;
-							if(transitionsLeft == 0){
-								simulationRunning = false;
-								endTime = System.currentTimeMillis();
-							}
-						}
 
 						if(!petri.isWaiting(transitionToFire))
 						{
-							try{
-								sendEventAfterFiring(transitionToFire);
-							} catch (IllegalArgumentException e){
-								//nothing wrong, the transition is not informed
+
+							if(transitionsLeft != null){
+								transitionsLeft--;
+								if(transitionsLeft == 0){
+									simulationRunning = false;
+									endTime = System.currentTimeMillis();
+								}
 							}
+
+							if(transitionToFire.getLabel().isInformed()){
+                                if(petri.isStochastic(transitionToFire))
+                                    listOfEvents.add(new String[]{transitionToFire.getId(), String.valueOf(transitionToFire.getLastTime())});
+                                else
+                                    listOfEvents.add(new String[]{transitionToFire.getId()});
+                            }
 						}
 
 						boolean automaticTransitions[] = petri.getAutomaticTransitions();
@@ -594,5 +604,9 @@ public class PetriMonitor {
 
 	public boolean isNetBlocked(){
 		return  petri.isBlockedPetriNet();
+	}
+
+	public ArrayList<String[]> getListOfEvents(){
+		return listOfEvents;
 	}
 }

@@ -1,8 +1,19 @@
 package org.unc.lac.javapetriconcurrencymonitor.petrinets;
 
+import java.io.InputStream;
+import java.io.StringWriter;
 import java.util.*;
 import java.util.stream.IntStream;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.message.BasicNameValuePair;
 import org.unc.lac.javapetriconcurrencymonitor.errors.IllegalTransitionFiringError;
 import org.unc.lac.javapetriconcurrencymonitor.exceptions.NotInitializedPetriNetException;
 import org.unc.lac.javapetriconcurrencymonitor.exceptions.PetriNetException;
@@ -13,6 +24,8 @@ import org.unc.lac.javapetriconcurrencymonitor.petrinets.components.PetriNode;
 import org.unc.lac.javapetriconcurrencymonitor.petrinets.components.MPlace;
 import org.unc.lac.javapetriconcurrencymonitor.petrinets.components.MTransition;
 import org.unc.lac.javapetriconcurrencymonitor.utils.MatrixUtils;
+
+
 
 /**
  * Implementation for petri net model.
@@ -126,10 +139,19 @@ public abstract class RootPetriNet {
 	/**
 	 * Initialize the petri net and computes enabled transitions for the first time.
 	 * This method must be called before being ready to fire a transition.
+	 * Verifies that there is at least one non automatic transition enabled
 	 * @see RootPetriNet#computeEnabledTransitions()
 	 */
 	public void initializePetriNet(){
 		enabledTransitions = computeEnabledTransitions();
+
+		boolean blocked = true;
+		for(int i = 0; i < enabledTransitions.length; i++){
+			if(enabledTransitions[i] && !automaticTransitions[i])
+				blocked = false;
+		}
+		blockedPetriNet = blocked;
+
 		initializedPetriNet = true;
 	}
 	
@@ -463,12 +485,14 @@ public abstract class RootPetriNet {
 		
 	}
 
+
 	/**
 	 * Implements state equation for petri nets enabling.
 	 * Takes into consideration transitions enabled by marking, reader and inhibition arcs.
 	 * Missing guards.
 	 * @return array with '1' on enabled transitions
 	 */
+	//TODO acomodar el metodo
 	boolean[] areEnabled(){
 
 		boolean blocked = true;
@@ -478,22 +502,13 @@ public abstract class RootPetriNet {
 		Arrays.fill(B,true);
 		boolean[] L = new boolean[transitions.length];
 		Arrays.fill(L,true);
+
 		//Calculo vector E con transiciones habilitadas por marca
-		//calcE()
 
 		int length, height;
 		length = inc_T.length;
 		height = inc_T[0].length;
-		/*for(int i = 0; i < length; i++) {
-			for (int j = 0; j < height; j++) {
-				if ((currentMarking[j] + inc_T[i][j]) < 0) {
-					E[i] = false;
-					break;
-				}
-			}
-		}
-		//System.out.println(Arrays.toString(E));
-		*/
+
 		int finalHeight = height;
 		IntStream.range(0, length)
 				.parallel()
@@ -505,21 +520,12 @@ public abstract class RootPetriNet {
 						}
 					}
 				});
-		//System.out.println(Arrays.toString(E));
 
 		//Calculo vector B con transiciones des sensibilizadas por arco inhibidor B
 		if(hasInhibitionArcs) {
 			length = inhibitionMatrix_T.length;
 			height = inhibitionMatrix_T[0].length;
 
-			/*for (int i = 0; i < length; i++) {
-				for (int j = 0; j < height; j++) {
-					if (inhibitionMatrix_T[i][j] && currentMarking[j] != 0) {
-						B[i] = false;
-						break;
-					}
-				}
-			}*/
 			int finalHeight1 = height;
 			IntStream.range(0, length)
 					.parallel()
@@ -533,21 +539,12 @@ public abstract class RootPetriNet {
 					});
 		}
 
-		//System.out.println(Arrays.toString(B));
 		//Calculo vector L con transiciones des sensibilizadas por arco lector L
 
 		if(hasReaderArcs) {
 			length = readerMatrix_T.length;
 			height = readerMatrix_T[0].length;
 
-			/*for (int i = 0; i < length; i++) {
-				for (int j = 0; j < height; j++) {
-					if (readerMatrix_T[i][j] > currentMarking[j]) {
-						L[i] = false;
-						break;
-					}
-				}
-			}*/
 			int finalHeight2 = height;
 			IntStream.range(0, length)
 					.parallel()
@@ -562,19 +559,87 @@ public abstract class RootPetriNet {
 
 		}
 
-		//System.out.println(Arrays.toString(L));
 		boolean[] enabled = new boolean[transitions.length];
 		for(int i = 0; i < transitions.length; i++){
 			enabled[i] = E[i] & B[i] & L[i];
-			if(enabled[i])
+			if(enabled[i]) //no agregar break
 				blocked = false;
 		}
 		blockedPetriNet = blocked;
-		//System.out.println(Arrays.toString(enabled));
 		//Calculo vector final Ex = E and B and L
 
 		return enabled;
 	}
+
+	/*
+	***areEnabled method without JavaStreams***
+	boolean[] areEnabled(){
+
+		boolean blocked = true;
+		boolean[] E = new boolean[transitions.length];
+		Arrays.fill(E,true);
+		boolean[] B = new boolean[transitions.length];
+		Arrays.fill(B,true);
+		boolean[] L = new boolean[transitions.length];
+		Arrays.fill(L,true);
+
+		//Calculo vector E con transiciones habilitadas por marca
+
+		int length, height;
+		length = inc_T.length;
+		height = inc_T[0].length;
+		for(int i = 0; i < length; i++) {
+			for (int j = 0; j < height; j++) {
+				if ((currentMarking[j] + inc_T[i][j]) < 0) {
+					E[i] = false;
+					break;
+				}
+			}
+		}
+
+		//Calculo vector B con transiciones des sensibilizadas por arco inhibidor B
+		if(hasInhibitionArcs) {
+			length = inhibitionMatrix_T.length;
+			height = inhibitionMatrix_T[0].length;
+
+			for (int i = 0; i < length; i++) {
+				for (int j = 0; j < height; j++) {
+					if (inhibitionMatrix_T[i][j] && currentMarking[j] != 0) {
+						B[i] = false;
+						break;
+					}
+				}
+			}
+
+		}
+
+		//Calculo vector L con transiciones des sensibilizadas por arco lector L
+
+		if(hasReaderArcs) {
+			length = readerMatrix_T.length;
+			height = readerMatrix_T[0].length;
+
+			for (int i = 0; i < length; i++) {
+				for (int j = 0; j < height; j++) {
+					if (readerMatrix_T[i][j] > currentMarking[j]) {
+						L[i] = false;
+						break;
+					}
+				}
+			}
+		}
+
+		boolean[] enabled = new boolean[transitions.length];
+		for(int i = 0; i < transitions.length; i++){
+			enabled[i] = E[i] & B[i] & L[i];
+			if(enabled[i]) //no agregar break
+				blocked = false;
+		}
+		blockedPetriNet = blocked;
+		//Calculo vector final Ex = E and B and L
+
+		return enabled;
+	}*/
 	
 	/**
 	 * Adds a new guard to the petriNet or updates a guard's value.
