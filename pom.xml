@@ -6,7 +6,7 @@
 
     <parent>
         <groupId>org.unc.lac.petrinator</groupId>
-        <artifactId>petrinator</artifactId>
+        <artifactId>petrinator.parent</artifactId>
         <version>1.0</version>
     </parent>
     <artifactId>java_petri_engine</artifactId>
